@@ -2,6 +2,7 @@ import { Layout } from "@/components/layout";
 import { motion } from "framer-motion";
 import { Code, Settings, Lightbulb, ArrowRight } from "lucide-react";
 import { ProcessStep, SectionHeader } from "@/components/ui/shared-sections";
+import { fadeInUp, fadeInLeft, fadeInRight, staggerContainer, staggerItem } from "@/hooks/use-scroll-animation";
 import heroServices from "@/assets/hero-services.jpg";
 
 const serviceCards = [
@@ -30,9 +31,9 @@ const Services = () => {
         <div className="container-custom">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
+              initial="hidden"
+              animate="visible"
+              variants={fadeInLeft}
             >
               <h1 className="text-display mb-6">Our IT Services</h1>
               <p className="text-body-large">
@@ -41,14 +42,15 @@ const Services = () => {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              initial="hidden"
+              animate="visible"
+              variants={fadeInRight}
+              className="image-blend"
             >
               <img
                 src={heroServices}
                 alt="AI Technology Visualization"
-                className="rounded-xl shadow-hover w-full"
+                className="rounded-xl w-full"
               />
             </motion.div>
           </div>
@@ -58,15 +60,19 @@ const Services = () => {
       {/* Service Cards */}
       <section className="section-padding section-taupe">
         <div className="container-custom">
-          <div className="grid md:grid-cols-3 gap-8">
-            {serviceCards.map((service, index) => (
+          <motion.div 
+            className="grid md:grid-cols-3 gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            {serviceCards.map((service) => (
               <motion.div
                 key={service.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="service-card card-hover"
+                variants={staggerItem}
+                whileHover={{ y: -8, transition: { duration: 0.3 } }}
+                className="service-card"
               >
                 <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center mb-6">
                   <service.icon size={20} className="text-foreground" />
@@ -85,42 +91,63 @@ const Services = () => {
                 </ul>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Engagement Model */}
       <section className="section-padding">
         <div className="container-custom">
-          <SectionHeader
-            title="Engagement Model"
-            description="Our structured approach ensures clarity and consistent delivery."
-            centered={false}
-          />
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUp}
+          >
+            <SectionHeader
+              title="Engagement Model"
+              description="Our structured approach ensures clarity and consistent delivery."
+              centered={false}
+            />
+          </motion.div>
 
-          <div className="grid md:grid-cols-4 gap-8 mt-12">
-            <ProcessStep
-              number="01"
-              title="Consultation"
-              description="Deep dive understanding of requirements and strategic alignment."
-            />
-            <ProcessStep
-              number="02"
-              title="Solution Design"
-              description="Architecting scalable frameworks tailored to your needs."
-            />
-            <ProcessStep
-              number="03"
-              title="Execution"
-              description="Agile implementation focusing on quality and speed."
-            />
-            <ProcessStep
-              number="04"
-              title="Support & Scaling"
-              description="Continuous optimization and growth support."
-              isLast
-            />
-          </div>
+          <motion.div 
+            className="grid md:grid-cols-4 gap-8 mt-12"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={staggerItem}>
+              <ProcessStep
+                number="01"
+                title="Consultation"
+                description="Deep dive understanding of requirements and strategic alignment."
+              />
+            </motion.div>
+            <motion.div variants={staggerItem}>
+              <ProcessStep
+                number="02"
+                title="Solution Design"
+                description="Architecting scalable frameworks tailored to your needs."
+              />
+            </motion.div>
+            <motion.div variants={staggerItem}>
+              <ProcessStep
+                number="03"
+                title="Execution"
+                description="Agile implementation focusing on quality and speed."
+              />
+            </motion.div>
+            <motion.div variants={staggerItem}>
+              <ProcessStep
+                number="04"
+                title="Support & Scaling"
+                description="Continuous optimization and growth support."
+                isLast
+              />
+            </motion.div>
+          </motion.div>
         </div>
       </section>
     </Layout>
