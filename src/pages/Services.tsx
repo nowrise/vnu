@@ -2,7 +2,7 @@ import { Layout } from "@/components/layout";
 import { motion } from "framer-motion";
 import { Code, Settings, Lightbulb, ArrowRight } from "lucide-react";
 import { ProcessStep, SectionHeader } from "@/components/ui/shared-sections";
-import { fadeInUp, fadeInLeft, fadeInRight, staggerContainer, staggerItem } from "@/hooks/use-scroll-animation";
+import { fadeInUp, staggerContainer, staggerItem } from "@/hooks/use-scroll-animation";
 import { NeuralNetwork } from "@/components/ui/neural-network";
 
 const serviceCards = [
@@ -26,30 +26,29 @@ const serviceCards = [
 const Services = () => {
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="section-padding pt-32 md:pt-40">
-        <div className="container-custom">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeInLeft}
-            >
-              <h1 className="text-display mb-6">Our IT Services</h1>
-              <p className="text-body-large">
-                Scalable technology solutions designed to support business growth.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeInRight}
-              className="glass-card p-1"
-            >
-              <NeuralNetwork className="aspect-[4/3]" />
-            </motion.div>
-          </div>
+      {/* Hero Section - Full Width Interactive Background */}
+      <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center overflow-hidden">
+        {/* Background Layer - Interactive Network */}
+        <div className="absolute inset-0 z-0">
+          <NeuralNetwork className="w-full h-full" />
+        </div>
+        
+        {/* Overlay Layer - Soft Ivory gradient for readability */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#F9FAF7]/90 via-[#F9FAF7]/85 to-[#F9FAF7]/60" />
+        
+        {/* Content Layer */}
+        <div className="container-custom relative z-20 pt-24 md:pt-32">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
+            className="max-w-2xl"
+          >
+            <h1 className="text-display mb-6">Our IT Services</h1>
+            <p className="text-body-large text-muted-foreground">
+              Scalable technology solutions designed to support business growth.
+            </p>
+          </motion.div>
         </div>
       </section>
 
