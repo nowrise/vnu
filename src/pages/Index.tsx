@@ -14,12 +14,7 @@ import {
   BarChart3,
   Cloud,
 } from "lucide-react";
-import {
-  ProcessStep,
-  ServiceCard,
-  IndustryCard,
-  SectionHeader,
-} from "@/components/ui/shared-sections";
+import { ProcessStep, ServiceCard, IndustryCard, SectionHeader } from "@/components/ui/shared-sections";
 
 const Home = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -44,13 +39,10 @@ const Home = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="text-display mb-6">
-                Technology, AI & Talent Solutions for Growing Businesses
-              </h1>
+              <h1 className="text-display mb-6">Technology, AI & Talent Solutions for Growing Businesses</h1>
               <p className="text-body-large mb-8 max-w-lg">
-                Vriddhion & Udaanex IT Solutions Pvt Ltd is an IT and consulting
-                company delivering technology, AI-driven growth, and skilled talent
-                solutions for modern businesses.
+                Vriddhion & Udaanex IT Solutions Pvt Ltd is an IT and consulting company delivering technology,
+                AI-driven growth, and skilled talent solutions for modern businesses.
               </p>
               <div className="flex flex-wrap gap-4">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
@@ -81,29 +73,15 @@ const Home = () => {
               >
                 {/* Mac window buttons */}
                 <div className="flex items-center gap-2 mb-4">
-                  <motion.div
-                    className="w-3 h-3 rounded-full bg-red-400"
-                    whileHover={{ scale: 1.3 }}
-                  />
-                  <motion.div
-                    className="w-3 h-3 rounded-full bg-yellow-400"
-                    whileHover={{ scale: 1.3 }}
-                  />
-                  <motion.div
-                    className="w-3 h-3 rounded-full bg-green-400"
-                    whileHover={{ scale: 1.3 }}
-                  />
-                  <span className="ml-4 text-xs text-muted-foreground">
-                    Enterprise System View
-                  </span>
+                  <motion.div className="w-3 h-3 rounded-full bg-red-400" whileHover={{ scale: 1.3 }} />
+                  <motion.div className="w-3 h-3 rounded-full bg-yellow-400" whileHover={{ scale: 1.3 }} />
+                  <motion.div className="w-3 h-3 rounded-full bg-green-400" whileHover={{ scale: 1.3 }} />
+                  <span className="ml-4 text-xs text-muted-foreground">Enterprise System View</span>
                 </div>
 
                 {/* Dashboard content */}
                 <div className="grid grid-cols-2 gap-4">
-                  <motion.div
-                    className="bg-background rounded-lg p-4 hover-lift"
-                    whileHover={{ scale: 1.02 }}
-                  >
+                  <motion.div className="bg-background rounded-lg p-4 hover-lift" whileHover={{ scale: 1.02 }}>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                       <BarChart3 size={14} />
                       <span>Growth Metrics</span>
@@ -121,14 +99,9 @@ const Home = () => {
                     </div>
                   </motion.div>
 
-                  <motion.div
-                    className="bg-background rounded-lg p-4 hover-lift"
-                    whileHover={{ scale: 1.02 }}
-                  >
+                  <motion.div className="bg-background rounded-lg p-4 hover-lift" whileHover={{ scale: 1.02 }}>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-muted-foreground">
-                        AI Engine
-                      </span>
+                      <span className="text-xs text-muted-foreground">AI Engine</span>
                       <motion.div
                         className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center"
                         animate={{ rotate: 360 }}
@@ -137,9 +110,7 @@ const Home = () => {
                         <Settings size={14} className="text-primary" />
                       </motion.div>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Optimization Active
-                    </p>
+                    <p className="text-xs text-muted-foreground">Optimization Active</p>
                   </motion.div>
 
                   <motion.div
@@ -148,10 +119,10 @@ const Home = () => {
                   >
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Cloud size={14} />
-                      <span>Cloud Infrastructure</span>
+                      <span>Talent Deployement</span>
                     </div>
                     <div className="flex gap-2 ml-auto">
-                      {["AWS", "Azure", "Hybrid"].map((cloud, i) => (
+                      {["Engineers", "Analysts", "Trainers"].map((cloud, i) => (
                         <motion.span
                           key={cloud}
                           className="text-xs px-2 py-1 bg-muted rounded"
@@ -174,9 +145,7 @@ const Home = () => {
                       <div className="w-8 h-8 rounded-full bg-muted" />
                       <div>
                         <p className="text-sm font-medium">Project Lead</p>
-                        <p className="text-xs text-muted-foreground">
-                          Talent Deployed
-                        </p>
+                        <p className="text-xs text-muted-foreground">Talent Deployed</p>
                       </div>
                     </div>
                     <motion.span
@@ -207,31 +176,19 @@ const Home = () => {
             <ServiceCard
               icon={Code}
               title="IT Services & Engineering"
-              items={[
-                "Web & App Development",
-                "Custom Software Solutions",
-                "Cloud Infrastructure & Integrations",
-              ]}
+              items={["Web & App Development", "Custom Software Solutions", "Cloud Infrastructure & Integrations"]}
               onLinkClick={() => {}}
             />
             <ServiceCard
               icon={Settings}
               title="AI & Business Consulting"
-              items={[
-                "AI-powered Marketing Systems",
-                "Automation & Workflow Optimization",
-                "Business Growth Strategy",
-              ]}
+              items={["AI-powered Marketing Systems", "Automation & Workflow Optimization", "Business Growth Strategy"]}
               onLinkClick={() => {}}
             />
             <ServiceCard
               icon={Users}
               title="Talent & Resource Solutions"
-              items={[
-                "Skilled Interns & Freelancers",
-                "Contract IT Resources",
-                "Trainer & Specialist Onboarding",
-              ]}
+              items={["Skilled Interns & Freelancers", "Contract IT Resources", "Trainer & Specialist Onboarding"]}
               onLinkClick={() => {}}
             />
           </div>
@@ -299,16 +256,13 @@ const Home = () => {
             className="flex flex-col md:flex-row items-center justify-between gap-8"
           >
             <div>
-              <span className="text-xs uppercase tracking-widest text-primary mb-2 block">
-                TALENT PIPELINE
-              </span>
+              <span className="text-xs uppercase tracking-widest text-primary mb-2 block">TALENT PIPELINE</span>
               <h2 className="text-2xl md:text-3xl font-bold text-accent-foreground mb-3">
                 Our Education & Training Vertical
               </h2>
               <p className="text-accent-foreground/80 max-w-xl">
-                Through <span className="font-semibold">NowRise Institute</span>,
-                we train industry-ready talent aligned with real business and
-                project needs.
+                Through <span className="font-semibold">NowRise Institute</span>, we train industry-ready talent aligned
+                with real business and project needs.
               </p>
             </div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
@@ -332,12 +286,9 @@ const Home = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-heading mb-4">
-              Looking for Technology, Talent, or Growth?
-            </h2>
+            <h2 className="text-heading mb-4">Looking for Technology, Talent, or Growth?</h2>
             <p className="text-body-large mb-8">
-              Partner with Vriddhion & Udaanex IT Solutions for enterprise-grade
-              outcomes.
+              Partner with Vriddhion & Udaanex IT Solutions for enterprise-grade outcomes.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
