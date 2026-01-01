@@ -44,15 +44,15 @@ export const NeuralNetwork = ({ className = "" }: NeuralNetworkProps) => {
     const nodes = nodesRef.current;
     const mouse = mouseRef.current;
     
-    // Clear with dark background
-    ctx.fillStyle = "#1C1F26";
+    // Clear with Deep Slate Blue background
+    ctx.fillStyle = "#243447";
     ctx.fillRect(0, 0, width, height);
     
     // Connection distance
     const maxDistance = 120;
     const mouseInfluence = 150;
     
-    // Draw connections
+    // Draw connections with Sage Grey
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const dx = nodes[i].x - nodes[j].x;
@@ -60,9 +60,9 @@ export const NeuralNetwork = ({ className = "" }: NeuralNetworkProps) => {
         const distance = Math.sqrt(dx * dx + dy * dy);
         
         if (distance < maxDistance) {
-          const opacity = (1 - distance / maxDistance) * 0.4;
+          const opacity = (1 - distance / maxDistance) * 0.25;
           ctx.beginPath();
-          ctx.strokeStyle = `rgba(198, 167, 94, ${opacity})`;
+          ctx.strokeStyle = `rgba(159, 174, 161, ${opacity})`;
           ctx.lineWidth = 0.5;
           ctx.moveTo(nodes[i].x, nodes[i].y);
           ctx.lineTo(nodes[j].x, nodes[j].y);
@@ -176,14 +176,12 @@ export const NeuralNetwork = ({ className = "" }: NeuralNetworkProps) => {
   }, [initNodes, drawNetwork]);
 
   return (
-    <div className={`relative overflow-hidden rounded-xl ${className}`}>
-      <div className="absolute inset-0 bg-gradient-to-br from-[#243447]/20 to-transparent pointer-events-none z-10" />
+    <div className={`relative overflow-hidden ${className}`}>
       <canvas
         ref={canvasRef}
-        className="w-full h-full min-h-[300px] md:min-h-[400px]"
+        className="w-full h-full"
         style={{ display: "block" }}
       />
-      <div className="absolute inset-0 border border-white/10 rounded-xl pointer-events-none" />
     </div>
   );
 };
