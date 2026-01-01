@@ -50,24 +50,38 @@ const Contact = () => {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("contact_requests").insert({
-        name: data.name,
-        email: data.email,
-        purpose: data.purpose,
-        message: data.message,
+      const response = await supabase.functions.invoke('submit-form', {
+        body: {
+          formType: 'contact_requests',
+          data: {
+            name: data.name,
+            email: data.email,
+            purpose: data.purpose,
+            message: data.message,
+          }
+        }
       });
 
-      if (error) throw error;
+      if (response.error) {
+        throw new Error(response.error.message || 'Submission failed');
+      }
+
+      if (response.data?.error) {
+        throw new Error(response.data.error);
+      }
 
       toast({
         title: "Message sent!",
         description: "We'll get back to you as soon as possible.",
       });
       reset();
-    } catch (error) {
+    } catch (error: any) {
+      const message = error?.message?.includes('Too many requests') 
+        ? "Too many submissions. Please wait a moment and try again."
+        : "Failed to send message. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to send message. Please try again.",
+        description: message,
         variant: "destructive",
       });
     } finally {
