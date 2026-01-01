@@ -37,6 +37,7 @@ const enquiryTypes = [
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
 
   const {
     register,
@@ -53,6 +54,7 @@ const Contact = () => {
       const response = await supabase.functions.invoke('submit-form', {
         body: {
           formType: 'contact_requests',
+          honeypot: honeypot, // Hidden field for bot detection
           data: {
             name: data.name,
             email: data.email,
@@ -160,6 +162,19 @@ const Contact = () => {
                 <h2 className="text-2xl font-bold mb-8">Send a Message</h2>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                  {/* Honeypot field - hidden from users, catches bots */}
+                  <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden="true">
+                    <label htmlFor="website">Website</label>
+                    <input
+                      type="text"
+                      id="website"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                    />
+                  </div>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium mb-2">

@@ -102,7 +102,17 @@ serve(async (req) => {
                      req.headers.get('x-real-ip') || 
                      'unknown';
 
-    const { formType, data } = await req.json();
+    const { formType, data, honeypot } = await req.json();
+
+    // Honeypot check - if this field has any value, it's likely a bot
+    if (honeypot) {
+      console.warn(`Honeypot triggered for IP: ${clientIP}, form: ${formType}`);
+      // Return success to not reveal the honeypot detection
+      return new Response(
+        JSON.stringify({ success: true, message: 'Form submitted successfully' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Validate form type
     const validFormTypes = ['contact_requests', 'career_applications', 'nowrise_applications'];
