@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Code, Settings, Lightbulb, ArrowRight } from "lucide-react";
 import { ProcessStep, SectionHeader } from "@/components/ui/shared-sections";
 import { fadeInUp, fadeInLeft, fadeInRight, staggerContainer, staggerItem } from "@/hooks/use-scroll-animation";
-import heroServices from "@/assets/hero-services.jpg";
+import { NeuralNetwork } from "@/components/ui/neural-network";
 
 const serviceCards = [
   {
@@ -45,13 +45,9 @@ const Services = () => {
               initial="hidden"
               animate="visible"
               variants={fadeInRight}
-              className="image-blend"
+              className="glass-card p-1"
             >
-              <img
-                src={heroServices}
-                alt="AI Technology Visualization"
-                className="rounded-xl w-full"
-              />
+              <NeuralNetwork className="aspect-[4/3]" />
             </motion.div>
           </div>
         </div>
