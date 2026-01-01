@@ -135,7 +135,40 @@
 
   .card-hover:hover {
     box-shadow: var(--shadow-hover);
+    transform: translateY(-6px) scale(1.01);
+  }
+
+  /* Hover Scale */
+  .hover-scale {
+    @apply transition-transform duration-300 ease-out;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  /* Hover Lift */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .hover-lift:hover {
     transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Story Link - Underline Animation */
+  .story-link {
+    @apply relative inline-block;
+  }
+
+  .story-link::after {
+    content: '';
+    @apply absolute w-full scale-x-0 h-0.5 bottom-0 left-0 bg-primary origin-bottom-right transition-transform duration-300;
+  }
+
+  .story-link:hover::after {
+    @apply scale-x-100 origin-bottom-left;
   }
 
   /* Section Backgrounds */

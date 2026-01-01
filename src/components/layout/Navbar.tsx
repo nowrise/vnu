@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -19,7 +19,8 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, isAdmin, signOut } = useAuth();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { user, isAdmin, signOut, isLoading } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,7 +32,15 @@ export const Navbar = () => {
 
   const handleSignOut = async () => {
     await signOut();
+    setIsProfileOpen(false);
     navigate("/");
+  };
+
+  const getUserInitial = () => {
+    if (!user) return "U";
+    const email = user.email || "";
+    const name = user.user_metadata?.full_name || email;
+    return name.charAt(0).toUpperCase();
   };
 
   return (
@@ -42,7 +51,7 @@ export const Navbar = () => {
     >
       <nav className="container-custom flex items-center justify-between">
         {/* Brand */}
-        <Link to="/" className="flex flex-col">
+        <Link to="/" className="flex flex-col hover-lift">
           <span className="font-bold text-lg tracking-tight text-foreground">
             VRIDDHION & UDAANEX
           </span>
@@ -57,49 +66,107 @@ export const Navbar = () => {
             <Link
               key={link.path}
               to={link.path}
-              className={`nav-link text-sm ${
+              className={`nav-link story-link text-sm ${
                 location.pathname === link.path ? "active" : ""
               }`}
             >
               {link.name}
             </Link>
           ))}
-          
-          {user ? (
-            <div className="flex items-center gap-4">
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <LayoutDashboard size={16} />
-                  Admin
-                </Link>
+
+          {!isLoading && (
+            <>
+              {user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm hover:opacity-90 transition-all hover:scale-105"
+                  >
+                    {getUserInitial()}
+                  </button>
+
+                  <AnimatePresence>
+                    {isProfileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-2 w-56 glass-card rounded-lg shadow-hover overflow-hidden"
+                      >
+                        <div className="p-4 border-b border-border">
+                          <p className="font-medium text-sm truncate">
+                            {user.user_metadata?.full_name || "User"}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {user.email}
+                          </p>
+                        </div>
+                        <div className="p-2">
+                          <Link
+                            to="/profile"
+                            onClick={() => setIsProfileOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-secondary transition-colors"
+                          >
+                            <User size={16} />
+                            Profile
+                          </Link>
+                          {isAdmin && (
+                            <Link
+                              to="/admin"
+                              onClick={() => setIsProfileOpen(false)}
+                              className="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-secondary transition-colors"
+                            >
+                              <LayoutDashboard size={16} />
+                              Admin Dashboard
+                            </Link>
+                          )}
+                          <button
+                            onClick={handleSignOut}
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-secondary transition-colors text-left"
+                          >
+                            <LogOut size={16} />
+                            Sign Out
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Link
+                    to="/auth"
+                    className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link to="/auth" className="btn-gold text-sm px-5 py-2">
+                    Sign Up
+                  </Link>
+                </div>
               )}
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <LogOut size={16} />
-                Sign Out
-              </button>
-            </div>
-          ) : (
-            <Link to="/contact" className="btn-outline text-sm px-5 py-2">
-              Contact
-            </Link>
+            </>
           )}
         </div>
 
         {/* Mobile Menu Button */}
         <button
-          className="lg:hidden p-2"
+          className="lg:hidden p-2 hover:bg-secondary rounded-lg transition-colors"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Toggle menu"
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </nav>
+
+      {/* Click outside to close profile dropdown */}
+      {isProfileOpen && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setIsProfileOpen(false)}
+        />
+      )}
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -123,38 +190,74 @@ export const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-              
-              {user ? (
+
+              {!isLoading && (
                 <>
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-2 py-2 text-muted-foreground"
-                    >
-                      <LayoutDashboard size={16} />
-                      Admin Dashboard
-                    </Link>
+                  {user ? (
+                    <>
+                      <div className="border-t border-border pt-4 mt-2">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
+                            {getUserInitial()}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">
+                              {user.user_metadata?.full_name || "User"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {user.email}
+                            </p>
+                          </div>
+                        </div>
+                        <Link
+                          to="/profile"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-2 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <User size={16} />
+                          Profile
+                        </Link>
+                        {isAdmin && (
+                          <Link
+                            to="/admin"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center gap-2 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <LayoutDashboard size={16} />
+                            Admin Dashboard
+                          </Link>
+                        )}
+                        <button
+                          onClick={() => {
+                            handleSignOut();
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="flex items-center gap-2 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <LogOut size={16} />
+                          Sign Out
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="border-t border-border pt-4 mt-2 flex flex-col gap-3">
+                      <Link
+                        to="/auth"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="btn-outline text-center"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        to="/auth"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="btn-gold text-center"
+                      >
+                        Sign Up
+                      </Link>
+                    </div>
                   )}
-                  <button
-                    onClick={() => {
-                      handleSignOut();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="flex items-center gap-2 py-2 text-muted-foreground"
-                  >
-                    <LogOut size={16} />
-                    Sign Out
-                  </button>
                 </>
-              ) : (
-                <Link
-                  to="/contact"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="btn-gold text-center"
-                >
-                  Contact
-                </Link>
               )}
             </div>
           </motion.div>

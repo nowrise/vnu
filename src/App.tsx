@@ -14,6 +14,7 @@ import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/Dashboard";
 import NotFound from "./pages/NotFound";
 
@@ -36,6 +37,14 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
             <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/admin/*"
               element={

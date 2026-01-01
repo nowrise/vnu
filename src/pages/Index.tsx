@@ -1,6 +1,7 @@
 import { Layout } from "@/components/layout";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useRef } from "react";
 import {
   Code,
   Settings,
@@ -10,10 +11,8 @@ import {
   GraduationCap,
   Briefcase,
   Globe,
-  ArrowRight,
   BarChart3,
   Cloud,
-  UserCheck,
 } from "lucide-react";
 import {
   ProcessStep,
@@ -23,14 +22,24 @@ import {
 } from "@/components/ui/shared-sections";
 
 const Home = () => {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+
+  const dashboardY = useTransform(scrollYProgress, [0, 1], [0, 100]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.5]);
+
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="section-padding pt-32 md:pt-40">
+      <section ref={heroRef} className="section-padding pt-32 md:pt-40 overflow-hidden">
         <div className="container-custom">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <motion.div
+              style={{ opacity: textOpacity }}
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
@@ -44,28 +53,46 @@ const Home = () => {
                 solutions for modern businesses.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link to="/contact" className="btn-gold">
-                  Talk to Our Experts
-                </Link>
-                <Link to="/services" className="btn-outline">
-                  View Services
-                </Link>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                  <Link to="/contact" className="btn-gold">
+                    Talk to Our Experts
+                  </Link>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                  <Link to="/services" className="btn-outline">
+                    View Services
+                  </Link>
+                </motion.div>
               </div>
             </motion.div>
 
-            {/* Right Content - Dashboard Preview */}
+            {/* Right Content - Dashboard Preview with Parallax */}
             <motion.div
+              style={{ y: dashboardY }}
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="glass-card p-6 rounded-xl">
+              <motion.div
+                className="glass-card p-6 rounded-xl"
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 200 }}
+              >
                 {/* Mac window buttons */}
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                  <motion.div
+                    className="w-3 h-3 rounded-full bg-red-400"
+                    whileHover={{ scale: 1.3 }}
+                  />
+                  <motion.div
+                    className="w-3 h-3 rounded-full bg-yellow-400"
+                    whileHover={{ scale: 1.3 }}
+                  />
+                  <motion.div
+                    className="w-3 h-3 rounded-full bg-green-400"
+                    whileHover={{ scale: 1.3 }}
+                  />
                   <span className="ml-4 text-xs text-muted-foreground">
                     Enterprise System View
                   </span>
@@ -73,49 +100,76 @@ const Home = () => {
 
                 {/* Dashboard content */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-background rounded-lg p-4">
+                  <motion.div
+                    className="bg-background rounded-lg p-4 hover-lift"
+                    whileHover={{ scale: 1.02 }}
+                  >
                     <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                       <BarChart3 size={14} />
                       <span>Growth Metrics</span>
                     </div>
                     <div className="flex gap-1 h-16 items-end">
                       {[40, 55, 35, 70, 45, 80, 60].map((h, i) => (
-                        <div
+                        <motion.div
                           key={i}
                           className="flex-1 bg-muted rounded-t"
-                          style={{ height: `${h}%` }}
+                          initial={{ height: 0 }}
+                          animate={{ height: `${h}%` }}
+                          transition={{ delay: 0.5 + i * 0.1, duration: 0.5 }}
                         />
                       ))}
                     </div>
-                  </div>
+                  </motion.div>
 
-                  <div className="bg-background rounded-lg p-4">
+                  <motion.div
+                    className="bg-background rounded-lg p-4 hover-lift"
+                    whileHover={{ scale: 1.02 }}
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-muted-foreground">
                         AI Engine
                       </span>
-                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <motion.div
+                        className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                      >
                         <Settings size={14} className="text-primary" />
-                      </div>
+                      </motion.div>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Optimization Active
                     </p>
-                  </div>
+                  </motion.div>
 
-                  <div className="bg-background rounded-lg p-4 col-span-2 flex items-center gap-3">
+                  <motion.div
+                    className="bg-background rounded-lg p-4 col-span-2 flex items-center gap-3 hover-lift"
+                    whileHover={{ scale: 1.01 }}
+                  >
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Cloud size={14} />
                       <span>Cloud Infrastructure</span>
                     </div>
                     <div className="flex gap-2 ml-auto">
-                      <span className="text-xs px-2 py-1 bg-muted rounded">AWS</span>
-                      <span className="text-xs px-2 py-1 bg-muted rounded">Azure</span>
-                      <span className="text-xs px-2 py-1 bg-muted rounded">Hybrid</span>
+                      {["AWS", "Azure", "Hybrid"].map((cloud, i) => (
+                        <motion.span
+                          key={cloud}
+                          className="text-xs px-2 py-1 bg-muted rounded"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.8 + i * 0.1 }}
+                          whileHover={{ scale: 1.1 }}
+                        >
+                          {cloud}
+                        </motion.span>
+                      ))}
                     </div>
-                  </div>
+                  </motion.div>
 
-                  <div className="bg-background rounded-lg p-4 col-span-2 flex items-center justify-between">
+                  <motion.div
+                    className="bg-background rounded-lg p-4 col-span-2 flex items-center justify-between hover-lift"
+                    whileHover={{ scale: 1.01 }}
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-muted" />
                       <div>
@@ -125,12 +179,16 @@ const Home = () => {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
+                    <motion.span
+                      className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded"
+                      animate={{ opacity: [1, 0.5, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
                       ● Active
-                    </span>
-                  </div>
+                    </motion.span>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         </div>
@@ -233,7 +291,13 @@ const Home = () => {
       {/* Education Vertical CTA */}
       <section className="section-slate py-20">
         <div className="container-custom">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col md:flex-row items-center justify-between gap-8"
+          >
             <div>
               <span className="text-xs uppercase tracking-widest text-primary mb-2 block">
                 TALENT PIPELINE
@@ -247,34 +311,47 @@ const Home = () => {
                 project needs.
               </p>
             </div>
-            <Link
-              to="/nowrise-institute"
-              className="btn-outline border-accent-foreground text-accent-foreground hover:bg-accent-foreground hover:text-accent whitespace-nowrap"
-            >
-              Explore NowRise Institute
-            </Link>
-          </div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                to="/nowrise-institute"
+                className="btn-outline border-accent-foreground text-accent-foreground hover:bg-accent-foreground hover:text-accent whitespace-nowrap"
+              >
+                Explore NowRise Institute
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* Final CTA */}
       <section className="section-padding text-center">
         <div className="container-custom max-w-3xl">
-          <h2 className="text-heading mb-4">
-            Looking for Technology, Talent, or Growth?
-          </h2>
-          <p className="text-body-large mb-8">
-            Partner with Vriddhion & Udaanex IT Solutions for enterprise-grade
-            outcomes.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/contact" className="btn-gold">
-              Contact Us
-            </Link>
-            <Link to="/talent-solutions" className="btn-outline">
-              Hire Talent
-            </Link>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-heading mb-4">
+              Looking for Technology, Talent, or Growth?
+            </h2>
+            <p className="text-body-large mb-8">
+              Partner with Vriddhion & Udaanex IT Solutions for enterprise-grade
+              outcomes.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                <Link to="/contact" className="btn-gold">
+                  Contact Us
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                <Link to="/talent-solutions" className="btn-outline">
+                  Hire Talent
+                </Link>
+              </motion.div>
+            </div>
+          </motion.div>
         </div>
       </section>
     </Layout>
