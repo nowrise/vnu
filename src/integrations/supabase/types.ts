@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      career_applications: {
+        Row: {
+          cover_letter: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          resume_url: string | null
+          role_applied: string
+          status: string | null
+        }
+        Insert: {
+          cover_letter?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          resume_url?: string | null
+          role_applied: string
+          status?: string | null
+        }
+        Update: {
+          cover_letter?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          resume_url?: string | null
+          role_applied?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       contact_requests: {
         Row: {
           created_at: string
@@ -38,6 +71,87 @@ export type Database = {
           message?: string
           name?: string
           purpose?: string
+        }
+        Relationships: []
+      }
+      content_pages: {
+        Row: {
+          content_json: Json | null
+          id: string
+          page_name: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          content_json?: Json | null
+          id?: string
+          page_name: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          content_json?: Json | null
+          id?: string
+          page_name?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      nowrise_applications: {
+        Row: {
+          created_at: string
+          education: string | null
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          program: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          education?: string | null
+          email: string
+          id?: string
+          name: string
+          phone?: string | null
+          program: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          education?: string | null
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          program?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
         }
         Relationships: []
       }

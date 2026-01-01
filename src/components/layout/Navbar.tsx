@@ -1,7 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -15,8 +16,10 @@ const navLinks = [
 
 export const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, isAdmin, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +28,11 @@ export const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <header
@@ -56,12 +64,31 @@ export const Navbar = () => {
               {link.name}
             </Link>
           ))}
-          <Link
-            to="/contact"
-            className="btn-outline text-sm px-5 py-2"
-          >
-            Contact
-          </Link>
+          
+          {user ? (
+            <div className="flex items-center gap-4">
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <LayoutDashboard size={16} />
+                  Admin
+                </Link>
+              )}
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <LogOut size={16} />
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <Link to="/contact" className="btn-outline text-sm px-5 py-2">
+              Contact
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -96,13 +123,39 @@ export const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-              <Link
-                to="/contact"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="btn-gold text-center"
-              >
-                Contact
-              </Link>
+              
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-2 py-2 text-muted-foreground"
+                    >
+                      <LayoutDashboard size={16} />
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 py-2 text-muted-foreground"
+                  >
+                    <LogOut size={16} />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/contact"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="btn-gold text-center"
+                >
+                  Contact
+                </Link>
+              )}
             </div>
           </motion.div>
         )}
