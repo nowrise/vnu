@@ -26,29 +26,30 @@ const serviceCards = [
 const Services = () => {
   return (
     <Layout>
-      {/* Hero Section - Full Width Interactive Background */}
-      <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center overflow-hidden">
-        {/* Background Layer - Interactive Network */}
-        <div className="absolute inset-0 z-0">
-          <NeuralNetwork className="w-full h-full" />
-        </div>
-        
-        {/* Overlay Layer - Soft Ivory gradient for readability */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#F9FAF7]/90 via-[#F9FAF7]/85 to-[#F9FAF7]/60" />
-        
-        {/* Content Layer */}
-        <div className="container-custom relative z-20 pt-24 md:pt-32">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
-            className="max-w-2xl"
-          >
-            <h1 className="text-display mb-6">Our IT Services</h1>
-            <p className="text-body-large text-muted-foreground">
-              Scalable technology solutions designed to support business growth.
-            </p>
-          </motion.div>
+      {/* Hero Section - Dark Background with Left-Right Split */}
+      <section className="relative min-h-[70vh] md:min-h-[80vh] bg-[#243447] overflow-hidden">
+        <div className="container-custom h-full">
+          <div className="grid lg:grid-cols-[45%_55%] min-h-[70vh] md:min-h-[80vh] items-center">
+            {/* Left Side - Content */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={fadeInUp}
+              className="relative z-10 py-24 md:py-32 pr-8 lg:pr-12"
+            >
+              <h1 className="text-display mb-6 text-[#F9FAF7]">Our IT Services</h1>
+              <p className="text-body-large text-[#F9FAF7]/70">
+                Scalable technology solutions designed to support business growth.
+              </p>
+            </motion.div>
+            
+            {/* Right Side - Interactive Network */}
+            <div className="absolute lg:relative inset-0 lg:inset-auto h-full">
+              <NeuralNetwork className="w-full h-full" />
+              {/* Gradient fade on mobile for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#243447] via-[#243447]/60 to-transparent lg:hidden" />
+            </div>
+          </div>
         </div>
       </section>
 
