@@ -1,8 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Briefcase, Mail } from "lucide-react";
+import { Briefcase, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const CareerApplications = () => {
   const queryClient = useQueryClient();
@@ -32,6 +43,24 @@ const CareerApplications = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-career-applications"] });
       toast({ title: "Status updated" });
+    },
+  });
+
+  const deleteApplication = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("career_applications")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-career-applications"] });
+      toast({ title: "Application deleted" });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete", variant: "destructive" });
     },
   });
 
@@ -118,18 +147,44 @@ const CareerApplications = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <select
-                        value={app.status || "pending"}
-                        onChange={(e) =>
-                          updateStatus.mutate({ id: app.id, status: e.target.value })
-                        }
-                        className="text-sm px-3 py-1.5 rounded border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="reviewing">Reviewing</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                      </select>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={app.status || "pending"}
+                          onChange={(e) =>
+                            updateStatus.mutate({ id: app.id, status: e.target.value })
+                          }
+                          className="text-sm px-3 py-1.5 rounded border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="reviewing">Reviewing</option>
+                          <option value="approved">Approved</option>
+                          <option value="rejected">Rejected</option>
+                        </select>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button className="p-2 text-destructive hover:bg-destructive/10 rounded transition-colors">
+                              <Trash2 size={16} />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Application</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete the application from {app.name}? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteApplication.mutate(app.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </td>
                   </tr>
                 ))}

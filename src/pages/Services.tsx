@@ -27,7 +27,7 @@ const Services = () => {
   return (
     <Layout>
       {/* Hero Section - Dark Background with Left-Right Split */}
-      <section className="relative min-h-[60vh] md:min-h-[70vh] bg-[#243447] overflow-hidden -mt-[72px] pt-[72px]">
+      <section className="relative min-h-[60vh] md:min-h-[70vh] bg-accent overflow-hidden">
         <div className="container-custom h-full">
           <div className="grid lg:grid-cols-[45%_55%] min-h-[60vh] md:min-h-[70vh] items-center">
             {/* Left Side - Content */}
@@ -37,8 +37,8 @@ const Services = () => {
               variants={fadeInUp}
               className="relative z-10 py-16 md:py-20 pr-8 lg:pr-12"
             >
-              <h1 className="text-display mb-6 text-[#F9FAF7]">Our IT Services</h1>
-              <p className="text-body-large text-[#F9FAF7]/70">
+              <h1 className="text-display mb-6 text-accent-foreground">Our IT Services</h1>
+              <p className="text-body-large text-accent-foreground/70">
                 Scalable technology solutions designed to support business growth.
               </p>
             </motion.div>
@@ -47,7 +47,7 @@ const Services = () => {
             <div className="absolute lg:relative inset-0 lg:inset-auto h-full">
               <NeuralNetwork className="w-full h-full" />
               {/* Gradient fade on mobile for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#243447] via-[#243447]/60 to-transparent lg:hidden" />
+              <div className="absolute inset-0 bg-gradient-to-r from-accent via-accent/60 to-transparent lg:hidden" />
             </div>
           </div>
         </div>
