@@ -7,6 +7,7 @@ import { z } from "zod";
 import { MapPin, Mail, Briefcase, GraduationCap, Handshake, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { AuthRequiredForm } from "@/components/auth/AuthRequiredForm";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -35,7 +36,7 @@ const enquiryTypes = [
   },
 ];
 
-const Contact = () => {
+const ContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [honeypot, setHoneypot] = useState("");
 
@@ -54,7 +55,7 @@ const Contact = () => {
       const response = await supabase.functions.invoke('submit-form', {
         body: {
           formType: 'contact_requests',
-          honeypot: honeypot, // Hidden field for bot detection
+          honeypot: honeypot,
           data: {
             name: data.name,
             email: data.email,
@@ -92,6 +93,111 @@ const Contact = () => {
   };
 
   return (
+    <div className="glass-card p-8 rounded-xl">
+      <h2 className="text-2xl font-bold mb-8">Send a Message</h2>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Honeypot field - hidden from users, catches bots */}
+        <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden="true">
+          <label htmlFor="website">Website</label>
+          <input
+            type="text"
+            id="website"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+          />
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Name
+            </label>
+            <input
+              {...register("name")}
+              placeholder="Your full name"
+              className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            />
+            {errors.name && (
+              <p className="text-destructive text-sm mt-1">
+                {errors.name.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Email
+            </label>
+            <input
+              {...register("email")}
+              type="email"
+              placeholder="email@example.com"
+              className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            />
+            {errors.email && (
+              <p className="text-destructive text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Purpose
+          </label>
+          <select
+            {...register("purpose")}
+            className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+          >
+            <option value="">Select enquiry type</option>
+            <option value="business">Business Enquiry</option>
+            <option value="training">Training Enquiry</option>
+            <option value="hiring">Hiring / Partnership</option>
+            <option value="careers">Career Application</option>
+            <option value="other">Other</option>
+          </select>
+          {errors.purpose && (
+            <p className="text-destructive text-sm mt-1">
+              {errors.purpose.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Message
+          </label>
+          <textarea
+            {...register("message")}
+            rows={5}
+            placeholder="How can we help you?"
+            className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
+          />
+          {errors.message && (
+            <p className="text-destructive text-sm mt-1">
+              {errors.message.message}
+            </p>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="btn-gold flex items-center justify-center gap-2 w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? "Sending..." : "Send Message"}
+          <ArrowRight size={16} />
+        </button>
+      </form>
+    </div>
+  );
+};
+
+const Contact = () => {
+  return (
     <Layout>
       <section className="section-padding pt-32 md:pt-40">
         <div className="container-custom">
@@ -109,7 +215,7 @@ const Contact = () => {
               </p>
 
               <div className="border-t border-border pt-8 space-y-8">
-                {enquiryTypes.map((type, index) => (
+                {enquiryTypes.map((type) => (
                   <div key={type.title} className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
                       <type.icon size={18} className="text-primary" />
@@ -158,106 +264,9 @@ const Contact = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="glass-card p-8 rounded-xl">
-                <h2 className="text-2xl font-bold mb-8">Send a Message</h2>
-
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                  {/* Honeypot field - hidden from users, catches bots */}
-                  <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden="true">
-                    <label htmlFor="website">Website</label>
-                    <input
-                      type="text"
-                      id="website"
-                      name="website"
-                      tabIndex={-1}
-                      autoComplete="off"
-                      value={honeypot}
-                      onChange={(e) => setHoneypot(e.target.value)}
-                    />
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Name
-                      </label>
-                      <input
-                        {...register("name")}
-                        placeholder="Your full name"
-                        className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                      />
-                      {errors.name && (
-                        <p className="text-destructive text-sm mt-1">
-                          {errors.name.message}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Email
-                      </label>
-                      <input
-                        {...register("email")}
-                        type="email"
-                        placeholder="email@example.com"
-                        className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                      />
-                      {errors.email && (
-                        <p className="text-destructive text-sm mt-1">
-                          {errors.email.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Purpose
-                    </label>
-                    <select
-                      {...register("purpose")}
-                      className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                    >
-                      <option value="">Select enquiry type</option>
-                      <option value="business">Business Enquiry</option>
-                      <option value="training">Training Enquiry</option>
-                      <option value="hiring">Hiring / Partnership</option>
-                      <option value="careers">Career Application</option>
-                      <option value="other">Other</option>
-                    </select>
-                    {errors.purpose && (
-                      <p className="text-destructive text-sm mt-1">
-                        {errors.purpose.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Message
-                    </label>
-                    <textarea
-                      {...register("message")}
-                      rows={5}
-                      placeholder="How can we help you?"
-                      className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
-                    />
-                    {errors.message && (
-                      <p className="text-destructive text-sm mt-1">
-                        {errors.message.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="btn-gold flex items-center justify-center gap-2 w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? "Sending..." : "Send Message"}
-                    <ArrowRight size={16} />
-                  </button>
-                </form>
-              </div>
+              <AuthRequiredForm message="Please sign in to send us a message. This helps us serve you better.">
+                <ContactForm />
+              </AuthRequiredForm>
             </motion.div>
           </div>
         </div>
