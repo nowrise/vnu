@@ -161,19 +161,41 @@ const Auth = () => {
   const handleForgotPassword = async (data: ForgotPasswordFormData) => {
     setIsSubmitting(true);
     try {
-      const { error } = await resetPassword(data.email);
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Unable to send reset email. Please try again.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Reset email sent!",
-          description: "Check your inbox for password reset instructions.",
-        });
-        setAuthMode("login");
+      // First check if the email is registered
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: "check_if_user_exists_dummy_password_12345",
+      });
+
+      // If error is "Invalid login credentials", the user exists
+      // If error is something else like "User not found", the user doesn't exist
+      if (signInError) {
+        const errorMessage = signInError.message.toLowerCase();
+        
+        // User exists - proceed with password reset
+        if (errorMessage.includes("invalid login credentials") || errorMessage.includes("invalid")) {
+          const { error } = await resetPassword(data.email);
+          if (error) {
+            toast({
+              title: "Error",
+              description: "Unable to send reset email. Please try again.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Reset email sent!",
+              description: "Check your inbox for password reset instructions.",
+            });
+            setAuthMode("login");
+          }
+        } else {
+          // User doesn't exist or other error
+          toast({
+            title: "Email not found",
+            description: "No account exists with this email address. Please check or sign up.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       toast({

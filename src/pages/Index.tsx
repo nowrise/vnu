@@ -15,6 +15,7 @@ import {
   Cloud,
 } from "lucide-react";
 import { ProcessStep, ServiceCard, IndustryCard, SectionHeader } from "@/components/ui/shared-sections";
+import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
 
 const Home = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -276,6 +277,9 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Dynamic Forms Section */}
+      <DynamicFormDisplay pageName="home" />
 
       {/* Final CTA */}
       <section className="section-padding text-center">

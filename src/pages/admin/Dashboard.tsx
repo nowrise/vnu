@@ -12,6 +12,8 @@ import {
   Menu,
   X,
   ChevronRight,
+  ClipboardList,
+  Inbox,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -22,6 +24,8 @@ import CareerApplications from "./CareerApplications";
 import NowRiseApplications from "./NowRiseApplications";
 import UserManagement from "./UserManagement";
 import ContentManagement from "./ContentManagement";
+import FormManagement from "./FormManagement";
+import FormSubmissions from "./FormSubmissions";
 
 const sidebarLinks = [
   { name: "Overview", path: "/admin", icon: LayoutDashboard },
@@ -30,6 +34,8 @@ const sidebarLinks = [
   { name: "NowRise Applications", path: "/admin/nowrise", icon: GraduationCap },
   { name: "Users", path: "/admin/users", icon: Users },
   { name: "Content", path: "/admin/content", icon: FileText },
+  { name: "Forms", path: "/admin/forms", icon: ClipboardList },
+  { name: "Form Submissions", path: "/admin/submissions", icon: Inbox },
 ];
 
 const AdminDashboard = () => {
@@ -148,6 +154,8 @@ const AdminDashboard = () => {
             <Route path="/nowrise" element={<NowRiseApplications />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/content" element={<ContentManagement />} />
+            <Route path="/forms" element={<FormManagement />} />
+            <Route path="/submissions" element={<FormSubmissions />} />
           </Routes>
         </div>
       </main>
