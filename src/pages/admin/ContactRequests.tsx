@@ -1,9 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Mail, ExternalLink } from "lucide-react";
+import { Mail, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const ContactRequests = () => {
+  const queryClient = useQueryClient();
+
   const { data: contacts, isLoading } = useQuery({
     queryKey: ["admin-contacts"],
     queryFn: async () => {
@@ -14,6 +28,24 @@ const ContactRequests = () => {
 
       if (error) throw error;
       return data;
+    },
+  });
+
+  const deleteContact = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("contact_requests")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-contacts"] });
+      toast({ title: "Contact request deleted" });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete", variant: "destructive" });
     },
   });
 
@@ -55,6 +87,9 @@ const ContactRequests = () => {
                   <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">
                     Message
                   </th>
+                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -84,6 +119,32 @@ const ContactRequests = () => {
                       <p className="text-sm text-muted-foreground truncate">
                         {contact.message}
                       </p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="p-2 text-destructive hover:bg-destructive/10 rounded transition-colors">
+                            <Trash2 size={16} />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Contact Request</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete this contact request from {contact.name}? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteContact.mutate(contact.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </td>
                   </tr>
                 ))}
