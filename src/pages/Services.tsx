@@ -27,15 +27,15 @@ const Services = () => {
   return (
     <Layout>
       {/* Hero Section - Dark Background with Left-Right Split */}
-      <section className="relative min-h-[70vh] md:min-h-[80vh] bg-[#243447] overflow-hidden">
+      <section className="relative min-h-[60vh] md:min-h-[70vh] bg-[#243447] overflow-hidden -mt-[72px] pt-[72px]">
         <div className="container-custom h-full">
-          <div className="grid lg:grid-cols-[45%_55%] min-h-[70vh] md:min-h-[80vh] items-center">
+          <div className="grid lg:grid-cols-[45%_55%] min-h-[60vh] md:min-h-[70vh] items-center">
             {/* Left Side - Content */}
             <motion.div
               initial="hidden"
               animate="visible"
               variants={fadeInUp}
-              className="relative z-10 py-24 md:py-32 pr-8 lg:pr-12"
+              className="relative z-10 py-16 md:py-20 pr-8 lg:pr-12"
             >
               <h1 className="text-display mb-6 text-[#F9FAF7]">Our IT Services</h1>
               <p className="text-body-large text-[#F9FAF7]/70">

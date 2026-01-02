@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { Menu, X, LogOut, LayoutDashboard, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -22,6 +24,22 @@ export const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, isAdmin, signOut, isLoading } = useAuth();
 
+  // Fetch profile data for real-time name updates
+  const { data: profile } = useQuery({
+    queryKey: ["navbar-profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
+        .single();
+      return data;
+    },
+    enabled: !!user?.id,
+    staleTime: 0, // Always refetch when component mounts
+  });
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -36,11 +54,10 @@ export const Navbar = () => {
     navigate("/");
   };
 
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email || "User";
+
   const getUserInitial = () => {
-    if (!user) return "U";
-    const email = user.email || "";
-    const name = user.user_metadata?.full_name || email;
-    return name.charAt(0).toUpperCase();
+    return displayName.charAt(0).toUpperCase();
   };
 
   const isActivePath = (path: string) => {
@@ -94,28 +111,26 @@ export const Navbar = () => {
                 <div className="relative">
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm hover:opacity-90 transition-all hover:scale-105"
+                    className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm hover:opacity-90 transition-transform duration-100 hover:scale-105"
                   >
                     {getUserInitial()}
                   </button>
 
-                  <AnimatePresence>
-                    {isProfileOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute right-0 mt-2 w-56 glass-card rounded-lg shadow-hover overflow-hidden"
-                      >
-                        <div className="p-4 border-b border-border">
-                          <p className="font-medium text-sm truncate">
-                            {user.user_metadata?.full_name || "User"}
-                          </p>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {user.email}
-                          </p>
-                        </div>
+                  {isProfileOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.1 }}
+                      className="absolute right-0 mt-2 w-56 glass-card rounded-lg shadow-hover overflow-hidden"
+                    >
+                      <div className="p-4 border-b border-border">
+                        <p className="font-medium text-sm truncate">
+                          {displayName}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {user.email}
+                        </p>
+                      </div>
                         <div className="p-2">
                           <Link
                             to="/profile"
@@ -135,17 +150,16 @@ export const Navbar = () => {
                               Admin Dashboard
                             </Link>
                           )}
-                          <button
-                            onClick={handleSignOut}
-                            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-secondary transition-colors text-left"
-                          >
-                            <LogOut size={16} />
-                            Sign Out
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                        <button
+                          onClick={handleSignOut}
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-secondary transition-colors text-left"
+                        >
+                          <LogOut size={16} />
+                          Sign Out
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
@@ -218,7 +232,7 @@ export const Navbar = () => {
                           </div>
                           <div>
                             <p className="font-medium text-sm">
-                              {user.user_metadata?.full_name || "User"}
+                              {displayName}
                             </p>
                             <p className="text-xs text-muted-foreground">
                               {user.email}

@@ -22,9 +22,9 @@ export const NeuralNetwork = ({ className = "" }: NeuralNetworkProps) => {
 
   const initNodes = useCallback((width: number, height: number) => {
     const nodes: Node[] = [];
-    const nodeCount = Math.floor((width * height) / 8000);
+    const nodeCount = Math.floor((width * height) / 4000); // Increased density
     
-    for (let i = 0; i < Math.min(nodeCount, 60); i++) {
+    for (let i = 0; i < Math.min(nodeCount, 120); i++) { // More nodes
       const x = Math.random() * width;
       const y = Math.random() * height;
       nodes.push({
@@ -100,18 +100,19 @@ export const NeuralNetwork = ({ className = "" }: NeuralNetworkProps) => {
         }
       }
       
-      // Draw node with soft glow
+      // Draw node with enhanced glow
       const gradient = ctx.createRadialGradient(
         node.x, node.y, 0,
-        node.x, node.y, node.radius * 3
+        node.x, node.y, node.radius * 5
       );
-      gradient.addColorStop(0, "rgba(198, 167, 94, 0.8)");
-      gradient.addColorStop(0.5, "rgba(198, 167, 94, 0.2)");
+      gradient.addColorStop(0, "rgba(198, 167, 94, 1)");
+      gradient.addColorStop(0.3, "rgba(198, 167, 94, 0.5)");
+      gradient.addColorStop(0.6, "rgba(198, 167, 94, 0.15)");
       gradient.addColorStop(1, "rgba(198, 167, 94, 0)");
       
       ctx.beginPath();
       ctx.fillStyle = gradient;
-      ctx.arc(node.x, node.y, node.radius * 3, 0, Math.PI * 2);
+      ctx.arc(node.x, node.y, node.radius * 5, 0, Math.PI * 2);
       ctx.fill();
       
       // Core node
