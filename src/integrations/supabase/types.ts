@@ -98,6 +98,83 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_forms: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          display_type: string
+          fields: Json
+          form_name: string
+          id: string
+          is_published: boolean
+          popup_trigger_text: string | null
+          section_title: string | null
+          target_page: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_type?: string
+          fields?: Json
+          form_name: string
+          id?: string
+          is_published?: boolean
+          popup_trigger_text?: string | null
+          section_title?: string | null
+          target_page: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_type?: string
+          fields?: Json
+          form_name?: string
+          id?: string
+          is_published?: boolean
+          popup_trigger_text?: string | null
+          section_title?: string | null
+          target_page?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      form_submissions: {
+        Row: {
+          created_at: string
+          form_id: string
+          id: string
+          status: string
+          submission_data: Json
+        }
+        Insert: {
+          created_at?: string
+          form_id: string
+          id?: string
+          status?: string
+          submission_data?: Json
+        }
+        Update: {
+          created_at?: string
+          form_id?: string
+          id?: string
+          status?: string
+          submission_data?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_submissions_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "custom_forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nowrise_applications: {
         Row: {
           created_at: string

@@ -192,7 +192,7 @@ const ContentManagement = () => {
               {pages.map((page) => (
                 <div
                   key={page.id}
-                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                  className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
                     selectedPage?.id === page.id
                       ? "bg-primary/10 border border-primary/20"
                       : "hover:bg-secondary"
