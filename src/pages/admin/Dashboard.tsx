@@ -46,7 +46,8 @@ const AdminDashboard = () => {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/");
+    // Use replace to prevent admin URL from staying in history
+    navigate("/", { replace: true });
   };
 
   return (
@@ -60,7 +61,7 @@ const AdminDashboard = () => {
         <div className="flex flex-col h-full">
           {/* Brand */}
           <div className="p-6 border-b border-accent-foreground/10">
-            <Link to="/" className="flex flex-col">
+            <Link to="/" replace className="flex flex-col">
               <span className="font-bold text-lg tracking-tight">
                 VRIDDHION & UDAANEX
               </span>
