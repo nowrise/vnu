@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
+import logo from "@/assets/logo.png";
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "Services", path: "/services" },
@@ -102,9 +102,7 @@ export const Navbar = () => {
       <nav className="container-custom flex items-center justify-between">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-3 hover-lift group">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors">
-            <span className="font-bold text-primary text-lg">V</span>
-          </div>
+          <img src={logo} alt="VU Logo" className="w-10 h-10 object-contain" />
           <div className="flex flex-col">
             <span className="font-bold text-base tracking-tight text-foreground leading-tight">
               VRIDDHION & UDAANEX

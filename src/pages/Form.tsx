@@ -238,7 +238,7 @@ const FormPage = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-card rounded-xl p-8"
+            className="bg-card border border-border rounded-xl p-8 shadow-lg"
           >
             <AnimatePresence mode="wait">
               {isSubmitted ? (
