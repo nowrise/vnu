@@ -111,18 +111,20 @@ export const Navbar = () => {
                 <div className="relative">
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm hover:opacity-90 transition-transform duration-100 hover:scale-105"
+                    className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm transition-all duration-75 hover:scale-105 active:scale-95"
                   >
                     {getUserInitial()}
                   </button>
 
-                  {isProfileOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.1 }}
-                      className="absolute right-0 mt-2 w-56 glass-card rounded-lg shadow-hover overflow-hidden"
-                    >
+                  <AnimatePresence>
+                    {isProfileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                        transition={{ duration: 0.1, ease: "easeOut" }}
+                        className="absolute right-0 mt-2 w-56 glass-card rounded-lg shadow-hover overflow-hidden"
+                      >
                       <div className="p-4 border-b border-border">
                         <p className="font-medium text-sm truncate">
                           {displayName}
@@ -157,9 +159,10 @@ export const Navbar = () => {
                           <LogOut size={16} />
                           Sign Out
                         </button>
-                      </div>
-                    </motion.div>
-                  )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ) : (
                 <div className="flex items-center gap-3">

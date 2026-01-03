@@ -26,8 +26,8 @@ interface CustomForm {
   form_name: string;
   description: string | null;
   fields: FormField[];
-  target_page: string;
-  display_type: "popup" | "section";
+  target_pages: string[];
+  display_types: string[];
   is_published: boolean;
   popup_trigger_text: string | null;
   section_title: string | null;
@@ -48,15 +48,20 @@ export const DynamicFormDisplay = ({ pageName }: DynamicFormDisplayProps) => {
       const { data, error } = await supabase
         .from("custom_forms")
         .select("*")
-        .eq("target_page", pageName)
         .eq("is_published", true);
 
       if (error) throw error;
-      return (data || []).map((form) => ({
+      
+      // Filter forms where target_page contains the pageName
+      const allForms = (data || []).map((form) => ({
         ...form,
         fields: (form.fields as unknown as FormField[]) || [],
-        display_type: form.display_type as "popup" | "section",
+        target_pages: form.target_page ? form.target_page.split(",") : [],
+        display_types: form.display_type ? form.display_type.split(",") : [],
       })) as CustomForm[];
+      
+      // Return only forms targeting this page
+      return allForms.filter(form => form.target_pages.includes(pageName));
     },
   });
 
@@ -91,8 +96,8 @@ export const DynamicFormDisplay = ({ pageName }: DynamicFormDisplayProps) => {
     setFormData((prev) => ({ ...prev, [fieldId]: value }));
   };
 
-  const popupForms = forms?.filter((f) => f.display_type === "popup") || [];
-  const sectionForms = forms?.filter((f) => f.display_type === "section") || [];
+  const popupForms = forms?.filter((f) => f.display_types.includes("popup")) || [];
+  const sectionForms = forms?.filter((f) => f.display_types.includes("section")) || [];
 
   const renderField = (field: FormField) => {
     const baseClasses =

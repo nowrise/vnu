@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Users, UserCheck, Award, Settings, ArrowRight } from "lucide-react";
 import { ProcessStep, SectionHeader } from "@/components/ui/shared-sections";
 import heroTalent from "@/assets/hero-talent.jpg";
+import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
 
 const solutions = [
   {
@@ -129,6 +130,8 @@ const TalentSolutions = () => {
           </div>
         </div>
       </section>
+
+      <DynamicFormDisplay pageName="talent-solutions" />
     </Layout>
   );
 };

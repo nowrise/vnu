@@ -36,8 +36,8 @@ interface CustomForm {
   form_name: string;
   description: string | null;
   fields: FormField[];
-  target_page: string;
-  display_type: "popup" | "section";
+  target_pages: string[];
+  display_types: string[];
   is_published: boolean;
   popup_trigger_text: string | null;
   section_title: string | null;
@@ -89,7 +89,8 @@ const FormManagement = () => {
       return (data || []).map((form) => ({
         ...form,
         fields: (form.fields as unknown as FormField[]) || [],
-        display_type: form.display_type as "popup" | "section",
+        target_pages: form.target_page ? form.target_page.split(",") : [],
+        display_types: form.display_type ? form.display_type.split(",") : [],
       })) as CustomForm[];
     },
   });
@@ -101,6 +102,7 @@ const FormManagement = () => {
         .insert({
           form_name: formName,
           target_page: "home",
+          display_type: "popup",
           fields: [] as unknown as never,
         })
         .select()
@@ -110,7 +112,8 @@ const FormManagement = () => {
       return {
         ...data,
         fields: (data.fields as unknown as FormField[]) || [],
-        display_type: data.display_type as "popup" | "section",
+        target_pages: data.target_page ? data.target_page.split(",") : [],
+        display_types: data.display_type ? data.display_type.split(",") : [],
       } as CustomForm;
     },
     onSuccess: (data) => {
@@ -134,8 +137,8 @@ const FormManagement = () => {
           form_name: form.form_name,
           description: form.description,
           fields: form.fields as unknown as never,
-          target_page: form.target_page,
-          display_type: form.display_type,
+          target_page: form.target_pages?.join(",") || "",
+          display_type: form.display_types?.join(",") || "popup",
           is_published: form.is_published,
           popup_trigger_text: form.popup_trigger_text,
           section_title: form.section_title,
@@ -303,9 +306,9 @@ const FormManagement = () => {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {availablePages.find((p) => p.value === form.target_page)?.label || form.target_page}
+                      {form.target_pages?.map(p => availablePages.find((ap) => ap.value === p)?.label || p).join(", ") || "No pages"}
                       {" • "}
-                      {form.display_type === "popup" ? "Popup" : "Section"}
+                      {form.display_types?.map(d => d === "popup" ? "Popup" : "Section").join(" & ") || "Popup"}
                     </p>
                   </div>
                   <AlertDialog>
@@ -397,45 +400,67 @@ const FormManagement = () => {
               {/* Form Settings */}
               <div className="grid md:grid-cols-2 gap-4 mb-6 p-4 bg-secondary/30 rounded-lg">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Target Page</label>
-                  <Select
-                    value={editingForm.target_page}
-                    onValueChange={(value) =>
-                      setEditingForm({ ...editingForm, target_page: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select page" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availablePages.map((page) => (
-                        <SelectItem key={page.value} value={page.value}>
+                  <label className="block text-sm font-medium mb-2">Target Pages (select multiple)</label>
+                  <div className="flex flex-wrap gap-2 p-3 rounded border border-border bg-background min-h-[42px]">
+                    {availablePages.map((page) => {
+                      const isSelected = editingForm.target_pages?.includes(page.value);
+                      return (
+                        <button
+                          key={page.value}
+                          type="button"
+                          onClick={() => {
+                            const currentPages = editingForm.target_pages || [];
+                            const newPages = isSelected
+                              ? currentPages.filter((p) => p !== page.value)
+                              : [...currentPages, page.value];
+                            setEditingForm({ ...editingForm, target_pages: newPages });
+                          }}
+                          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                            isSelected
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                          }`}
+                        >
                           {page.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Display Type</label>
-                  <Select
-                    value={editingForm.display_type}
-                    onValueChange={(value: "popup" | "section") =>
-                      setEditingForm({ ...editingForm, display_type: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select display type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="popup">Popup Modal</SelectItem>
-                      <SelectItem value="section">Page Section</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <label className="block text-sm font-medium mb-2">Display Types (select multiple)</label>
+                  <div className="flex flex-wrap gap-2 p-3 rounded border border-border bg-background min-h-[42px]">
+                    {[
+                      { value: "popup", label: "Popup Modal" },
+                      { value: "section", label: "Page Section" },
+                    ].map((type) => {
+                      const isSelected = editingForm.display_types?.includes(type.value);
+                      return (
+                        <button
+                          key={type.value}
+                          type="button"
+                          onClick={() => {
+                            const currentTypes = editingForm.display_types || [];
+                            const newTypes = isSelected
+                              ? currentTypes.filter((t) => t !== type.value)
+                              : [...currentTypes, type.value];
+                            setEditingForm({ ...editingForm, display_types: newTypes });
+                          }}
+                          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                            isSelected
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                          }`}
+                        >
+                          {type.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {editingForm.display_type === "popup" && (
+                {editingForm.display_types?.includes("popup") && (
                   <div>
                     <label className="block text-sm font-medium mb-2">
                       Popup Trigger Button Text
@@ -455,7 +480,7 @@ const FormManagement = () => {
                   </div>
                 )}
 
-                {editingForm.display_type === "section" && (
+                {editingForm.display_types?.includes("section") && (
                   <div>
                     <label className="block text-sm font-medium mb-2">Section Title</label>
                     <input

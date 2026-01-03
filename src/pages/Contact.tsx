@@ -8,6 +8,7 @@ import { MapPin, Mail, Briefcase, GraduationCap, Handshake, ArrowRight } from "l
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { AuthRequiredForm } from "@/components/auth/AuthRequiredForm";
+import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -271,6 +272,8 @@ const Contact = () => {
           </div>
         </div>
       </section>
+
+      <DynamicFormDisplay pageName="contact" />
     </Layout>
   );
 };

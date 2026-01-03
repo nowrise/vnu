@@ -5,6 +5,7 @@ import { ArrowRight, BookOpen, Target, TrendingUp } from "lucide-react";
 import { SectionHeader } from "@/components/ui/shared-sections";
 import heroCareers from "@/assets/hero-careers.jpg";
 import workCulture from "@/assets/work-culture.jpg";
+import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
 
 const opportunities = [
   {
@@ -175,6 +176,8 @@ const Careers = () => {
           </div>
         </div>
       </section>
+
+      <DynamicFormDisplay pageName="careers" />
     </Layout>
   );
 };

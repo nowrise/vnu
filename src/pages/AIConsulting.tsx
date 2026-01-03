@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { ProcessStep, SectionHeader } from "@/components/ui/shared-sections";
 import heroConsulting from "@/assets/hero-consulting.jpg";
+import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
 
 const painPoints = [
   {
@@ -243,6 +244,8 @@ const AIConsulting = () => {
           </div>
         </div>
       </section>
+
+      <DynamicFormDisplay pageName="ai-consulting" />
     </Layout>
   );
 };

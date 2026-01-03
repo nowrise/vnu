@@ -9,6 +9,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { SectionHeader } from "@/components/ui/shared-sections";
+import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
 
 const values = [
   {
@@ -159,6 +160,8 @@ const About = () => {
           </Link>
         </div>
       </section>
+
+      <DynamicFormDisplay pageName="about" />
     </Layout>
   );
 };

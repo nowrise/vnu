@@ -4,6 +4,7 @@ import { Code, Settings, Lightbulb, ArrowRight } from "lucide-react";
 import { ProcessStep, SectionHeader } from "@/components/ui/shared-sections";
 import { fadeInUp, staggerContainer, staggerItem } from "@/hooks/use-scroll-animation";
 import { NeuralNetwork } from "@/components/ui/neural-network";
+import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
 
 const serviceCards = [
   {
@@ -146,6 +147,8 @@ const Services = () => {
           </motion.div>
         </div>
       </section>
+
+      <DynamicFormDisplay pageName="services" />
     </Layout>
   );
 };
