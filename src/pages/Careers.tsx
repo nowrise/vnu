@@ -6,6 +6,7 @@ import { SectionHeader } from "@/components/ui/shared-sections";
 import heroCareers from "@/assets/hero-careers.jpg";
 import workCulture from "@/assets/work-culture.jpg";
 import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
+import { SEOHead } from "@/components/SEOHead";
 
 const opportunities = [
   {
@@ -52,6 +53,7 @@ const culturePoints = [
 const Careers = () => {
   return (
     <Layout>
+      <SEOHead />
       {/* Hero Section */}
       <section className="section-padding pt-32 md:pt-40">
         <div className="container-custom">

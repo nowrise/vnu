@@ -5,6 +5,7 @@ import { ProcessStep, SectionHeader } from "@/components/ui/shared-sections";
 import { fadeInUp, staggerContainer, staggerItem } from "@/hooks/use-scroll-animation";
 import { NeuralNetwork } from "@/components/ui/neural-network";
 import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
+import { SEOHead } from "@/components/SEOHead";
 
 const serviceCards = [
   {
@@ -27,6 +28,7 @@ const serviceCards = [
 const Services = () => {
   return (
     <Layout>
+      <SEOHead />
       {/* Hero Section - Dark Background with Left-Right Split */}
       <section className="relative min-h-[60vh] md:min-h-[70vh] bg-accent overflow-hidden">
         <div className="container-custom h-full">
