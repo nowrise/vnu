@@ -107,6 +107,7 @@ const FormPage = () => {
 
   const renderField = (field: FormField) => {
     switch (field.type) {
+      case "text":
       case "short_answer":
       case "email":
       case "phone":
@@ -115,7 +116,7 @@ const FormPage = () => {
       case "date":
         return (
           <Input
-            type={field.type === "short_answer" ? "text" : field.type}
+            type={field.type === "short_answer" || field.type === "text" ? "text" : field.type}
             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}`}
             value={(formData[field.id] as string) || ""}
             onChange={(e) => handleInputChange(field.id, e.target.value)}
