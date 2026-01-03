@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X, LogOut, LayoutDashboard, User } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, User, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -22,6 +22,7 @@ export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const { user, isAdmin, signOut, isLoading } = useAuth();
 
   // Fetch profile data for real-time name updates
@@ -49,7 +50,9 @@ export const Navbar = () => {
   }, []);
 
   const handleSignOut = async () => {
+    setIsSigningOut(true);
     await signOut();
+    setIsSigningOut(false);
     setIsProfileOpen(false);
     navigate("/");
   };
@@ -137,7 +140,7 @@ export const Navbar = () => {
                           <Link
                             to="/profile"
                             onClick={() => setIsProfileOpen(false)}
-                            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-secondary transition-colors"
+                            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-75 hover:bg-secondary active:bg-secondary/80 active:scale-[0.98]"
                           >
                             <User size={16} />
                             Profile
@@ -146,7 +149,7 @@ export const Navbar = () => {
                             <Link
                               to="/admin"
                               onClick={() => setIsProfileOpen(false)}
-                              className="flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-secondary transition-colors"
+                              className="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-75 hover:bg-secondary active:bg-secondary/80 active:scale-[0.98]"
                             >
                               <LayoutDashboard size={16} />
                               Admin Dashboard
@@ -154,10 +157,15 @@ export const Navbar = () => {
                           )}
                         <button
                           onClick={handleSignOut}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-secondary transition-colors text-left"
+                          disabled={isSigningOut}
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-75 hover:bg-secondary active:bg-secondary/80 active:scale-[0.98] text-left disabled:opacity-50"
                         >
-                          <LogOut size={16} />
-                          Sign Out
+                          {isSigningOut ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
+                            <LogOut size={16} />
+                          )}
+                          {isSigningOut ? "Signing out..." : "Sign Out"}
                         </button>
                         </div>
                       </motion.div>
@@ -245,7 +253,7 @@ export const Navbar = () => {
                         <Link
                           to="/profile"
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="flex items-center gap-2 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                          className="flex items-center gap-2 py-2 px-2 rounded-md text-muted-foreground transition-all duration-75 hover:text-foreground hover:bg-secondary active:bg-secondary/80 active:scale-[0.98]"
                         >
                           <User size={16} />
                           Profile
@@ -254,7 +262,7 @@ export const Navbar = () => {
                           <Link
                             to="/admin"
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center gap-2 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                            className="flex items-center gap-2 py-2 px-2 rounded-md text-muted-foreground transition-all duration-75 hover:text-foreground hover:bg-secondary active:bg-secondary/80 active:scale-[0.98]"
                           >
                             <LayoutDashboard size={16} />
                             Admin Dashboard
@@ -265,10 +273,15 @@ export const Navbar = () => {
                             handleSignOut();
                             setIsMobileMenuOpen(false);
                           }}
-                          className="flex items-center gap-2 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                          disabled={isSigningOut}
+                          className="flex items-center gap-2 py-2 px-2 rounded-md text-muted-foreground transition-all duration-75 hover:text-foreground hover:bg-secondary active:bg-secondary/80 active:scale-[0.98] disabled:opacity-50"
                         >
-                          <LogOut size={16} />
-                          Sign Out
+                          {isSigningOut ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
+                            <LogOut size={16} />
+                          )}
+                          {isSigningOut ? "Signing out..." : "Sign Out"}
                         </button>
                       </div>
                     </>
