@@ -26,7 +26,8 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
   }
 
   if (requireAdmin && !isAdmin) {
-    return <Navigate to="/" replace />;
+    // Use replace to prevent admin URL from staying in history
+    return <Navigate to="/" replace state={{}} />;
   }
 
   return <>{children}</>;

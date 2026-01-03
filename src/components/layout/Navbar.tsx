@@ -76,7 +76,8 @@ export const Navbar = () => {
     await signOut();
     setIsSigningOut(false);
     setIsProfileOpen(false);
-    navigate("/");
+    // Use replace to prevent admin URL from staying in history
+    navigate("/", { replace: true });
   };
 
   const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email || "User";

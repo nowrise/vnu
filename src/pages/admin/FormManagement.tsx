@@ -25,6 +25,8 @@ import {
   Star,
   ToggleLeft,
   FileText,
+  ExternalLink,
+  Clipboard,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -593,6 +595,33 @@ const FormManagement = () => {
                   />
                 </div>
                 <div className="flex items-center gap-3">
+                  {editingForm.id && editingForm.is_published && (
+                    <div className="flex items-center gap-1 bg-secondary/50 rounded-lg px-2 py-1">
+                      <span className="text-xs text-muted-foreground hidden sm:inline">
+                        {window.location.origin}/f/{editingForm.id.slice(0, 8)}...
+                      </span>
+                      <button
+                        onClick={() => {
+                          const url = `${window.location.origin}/f/${editingForm.id}`;
+                          navigator.clipboard.writeText(url);
+                          toast({ title: "Link copied!", description: "Share this link anywhere" });
+                        }}
+                        className="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors"
+                        title="Copy form link"
+                      >
+                        <Clipboard size={14} />
+                      </button>
+                      <a
+                        href={`/f/${editingForm.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded transition-colors"
+                        title="Open in new tab"
+                      >
+                        <ExternalLink size={14} />
+                      </a>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
                       {editingForm.is_published ? "Published" : "Draft"}
