@@ -4,6 +4,7 @@ import { Users, UserCheck, Award, Settings, ArrowRight } from "lucide-react";
 import { ProcessStep, SectionHeader } from "@/components/ui/shared-sections";
 import heroTalent from "@/assets/hero-talent.jpg";
 import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
+import { SEOHead } from "@/components/SEOHead";
 
 const solutions = [
   {
@@ -35,6 +36,7 @@ const solutions = [
 const TalentSolutions = () => {
   return (
     <Layout>
+      <SEOHead />
       {/* Hero Section */}
       <section className="section-padding pt-32 md:pt-40">
         <div className="container-custom">

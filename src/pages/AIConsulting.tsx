@@ -14,6 +14,7 @@ import {
 import { ProcessStep, SectionHeader } from "@/components/ui/shared-sections";
 import heroConsulting from "@/assets/hero-consulting.jpg";
 import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
+import { SEOHead } from "@/components/SEOHead";
 
 const painPoints = [
   {
@@ -66,6 +67,7 @@ const solutions = [
 const AIConsulting = () => {
   return (
     <Layout>
+      <SEOHead />
       {/* Hero Section */}
       <section className="section-slate pt-32 md:pt-40 pb-20">
         <div className="container-custom">

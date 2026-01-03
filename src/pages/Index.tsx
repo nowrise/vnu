@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { ProcessStep, ServiceCard, IndustryCard, SectionHeader } from "@/components/ui/shared-sections";
 import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
+import { SEOHead } from "@/components/SEOHead";
 
 const Home = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -29,6 +30,7 @@ const Home = () => {
 
   return (
     <Layout>
+      <SEOHead />
       {/* Hero Section */}
       <section ref={heroRef} className="section-padding pt-32 md:pt-40 overflow-hidden">
         <div className="container-custom">

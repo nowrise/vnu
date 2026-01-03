@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { SectionHeader } from "@/components/ui/shared-sections";
 import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
+import { SEOHead } from "@/components/SEOHead";
 
 const values = [
   {
@@ -37,6 +38,7 @@ const values = [
 const About = () => {
   return (
     <Layout>
+      <SEOHead />
       {/* Hero Section */}
       <section className="section-padding pt-32 md:pt-40">
         <div className="container-custom">

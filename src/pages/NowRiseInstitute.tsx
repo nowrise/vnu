@@ -6,6 +6,7 @@ import { Code, Briefcase, Award } from "lucide-react";
 import { SectionHeader } from "@/components/ui/shared-sections";
 import heroNowrise from "@/assets/hero-nowrise.jpg";
 import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
+import { SEOHead } from "@/components/SEOHead";
 
 const programs = [
   {
@@ -41,6 +42,7 @@ const NowRiseInstitute = () => {
 
   return (
     <Layout>
+      <SEOHead />
       {/* Hero Section with Parallax */}
       <section ref={heroRef} className="section-padding pt-32 md:pt-40 overflow-hidden">
         <div className="container-custom">

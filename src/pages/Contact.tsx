@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { AuthRequiredForm } from "@/components/auth/AuthRequiredForm";
 import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
+import { SEOHead } from "@/components/SEOHead";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -200,6 +201,7 @@ const ContactForm = () => {
 const Contact = () => {
   return (
     <Layout>
+      <SEOHead />
       <section className="section-padding pt-32 md:pt-40">
         <div className="container-custom">
           <div className="grid lg:grid-cols-2 gap-16">
