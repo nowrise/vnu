@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X, LogOut, LayoutDashboard, User, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +23,7 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
   const { user, isAdmin, signOut, isLoading } = useAuth();
 
   // Fetch profile data for real-time name updates
@@ -48,6 +49,27 @@ export const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Close profile menu on outside click (without blocking the trigger/menu)
+  useEffect(() => {
+    if (!isProfileOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+      if (!target) return;
+      if (profileMenuRef.current && !profileMenuRef.current.contains(target)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    return () => document.removeEventListener("pointerdown", handlePointerDown, true);
+  }, [isProfileOpen]);
+
+  // Close profile menu when route changes
+  useEffect(() => {
+    setIsProfileOpen(false);
+  }, [location.pathname]);
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -111,9 +133,12 @@ export const Navbar = () => {
           {!isLoading && (
             <>
               {user ? (
-                <div className="relative">
+                <div ref={profileMenuRef} className="relative">
                   <button
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    type="button"
+                    onClick={() => setIsProfileOpen((v) => !v)}
+                    aria-haspopup="menu"
+                    aria-expanded={isProfileOpen}
                     className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm transition-all duration-75 hover:scale-105 active:scale-95"
                   >
                     {getUserInitial()}
@@ -126,7 +151,8 @@ export const Navbar = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 5, scale: 0.95 }}
                         transition={{ duration: 0.1, ease: "easeOut" }}
-                        className="absolute right-0 mt-2 w-56 glass-card rounded-lg shadow-hover overflow-hidden"
+                        className="absolute right-0 z-50 mt-2 w-56 glass-card rounded-lg shadow-hover overflow-hidden pointer-events-auto"
+                        role="menu"
                       >
                       <div className="p-4 border-b border-border">
                         <p className="font-medium text-sm truncate">
@@ -198,14 +224,6 @@ export const Navbar = () => {
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </nav>
-
-      {/* Click outside to close profile dropdown */}
-      {isProfileOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setIsProfileOpen(false)}
-        />
-      )}
 
       {/* Mobile Menu */}
       <AnimatePresence>
