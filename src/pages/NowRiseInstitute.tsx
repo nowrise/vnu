@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { Code, Briefcase, Award } from "lucide-react";
 import { SectionHeader } from "@/components/ui/shared-sections";
 import heroNowrise from "@/assets/hero-nowrise.jpg";
+import { DynamicFormDisplay } from "@/components/DynamicFormDisplay";
 
 const programs = [
   {
@@ -185,6 +186,8 @@ const NowRiseInstitute = () => {
           </motion.div>
         </div>
       </section>
+
+      <DynamicFormDisplay pageName="nowrise-institute" />
     </Layout>
   );
 };
