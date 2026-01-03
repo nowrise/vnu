@@ -161,43 +161,17 @@ const Auth = () => {
   const handleForgotPassword = async (data: ForgotPasswordFormData) => {
     setIsSubmitting(true);
     try {
-      // First check if the email is registered
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: "check_if_user_exists_dummy_password_12345",
+      // Always attempt password reset without checking existence to prevent user enumeration
+      await resetPassword(data.email);
+      
+      // Always show same generic message regardless of whether email exists
+      toast({
+        title: "Check your email",
+        description: "If an account exists with this email, you will receive password reset instructions.",
       });
-
-      // If error is "Invalid login credentials", the user exists
-      // If error is something else like "User not found", the user doesn't exist
-      if (signInError) {
-        const errorMessage = signInError.message.toLowerCase();
-        
-        // User exists - proceed with password reset
-        if (errorMessage.includes("invalid login credentials") || errorMessage.includes("invalid")) {
-          const { error } = await resetPassword(data.email);
-          if (error) {
-            toast({
-              title: "Error",
-              description: "Unable to send reset email. Please try again.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Reset email sent!",
-              description: "Check your inbox for password reset instructions.",
-            });
-            setAuthMode("login");
-          }
-        } else {
-          // User doesn't exist or other error
-          toast({
-            title: "Email not found",
-            description: "No account exists with this email address. Please check or sign up.",
-            variant: "destructive",
-          });
-        }
-      }
+      setAuthMode("login");
     } catch (error) {
+      // Generic error message that doesn't reveal details
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
