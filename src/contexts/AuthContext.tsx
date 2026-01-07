@@ -22,7 +22,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const checkAdminRole = async (accessToken: string) => {
+  const ADMIN_CACHE_KEY = "admin_status_cache";
+  const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
+  const getCachedAdminStatus = (userId: string): boolean | null => {
+    try {
+      const cached = sessionStorage.getItem(ADMIN_CACHE_KEY);
+      if (!cached) return null;
+      
+      const { userId: cachedUserId, isAdmin, timestamp } = JSON.parse(cached);
+      
+      // Validate cache: same user and not expired
+      if (cachedUserId === userId && Date.now() - timestamp < CACHE_DURATION_MS) {
+        return isAdmin;
+      }
+      
+      // Clear invalid/expired cache
+      sessionStorage.removeItem(ADMIN_CACHE_KEY);
+      return null;
+    } catch {
+      sessionStorage.removeItem(ADMIN_CACHE_KEY);
+      return null;
+    }
+  };
+
+  const setCachedAdminStatus = (userId: string, isAdmin: boolean) => {
+    try {
+      sessionStorage.setItem(ADMIN_CACHE_KEY, JSON.stringify({
+        userId,
+        isAdmin,
+        timestamp: Date.now(),
+      }));
+    } catch {
+      // Ignore storage errors
+    }
+  };
+
+  const clearAdminCache = () => {
+    try {
+      sessionStorage.removeItem(ADMIN_CACHE_KEY);
+    } catch {
+      // Ignore storage errors
+    }
+  };
+
+  const checkAdminRole = async (accessToken: string, userId: string) => {
+    // Check cache first
+    const cached = getCachedAdminStatus(userId);
+    if (cached !== null) {
+      return cached;
+    }
+
     try {
       // Call backend edge function for secure server-side admin check
       const { data, error } = await supabase.functions.invoke("check-admin", {
@@ -35,7 +85,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("Error checking admin role:", error);
         return false;
       }
-      return data?.isAdmin === true;
+      
+      const isAdmin = data?.isAdmin === true;
+      setCachedAdminStatus(userId, isAdmin);
+      return isAdmin;
     } catch (error) {
       console.error("Error checking admin role:", error);
       return false;
@@ -52,10 +105,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (session?.user && session.access_token) {
           setTimeout(() => {
-            checkAdminRole(session.access_token).then(setIsAdmin);
+            checkAdminRole(session.access_token, session.user.id).then(setIsAdmin);
           }, 0);
         } else {
           setIsAdmin(false);
+          clearAdminCache();
         }
       }
     );
@@ -67,7 +121,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(false);
 
       if (session?.user && session.access_token) {
-        checkAdminRole(session.access_token).then(setIsAdmin);
+        checkAdminRole(session.access_token, session.user.id).then(setIsAdmin);
       }
     });
 
@@ -124,6 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
+    clearAdminCache();
     await supabase.auth.signOut();
     setIsAdmin(false);
   };
