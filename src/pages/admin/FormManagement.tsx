@@ -908,9 +908,17 @@ const FormManagement = () => {
                                 type="button"
                                 onClick={() => {
                                   const currentTypes = editingForm.display_types || [];
-                                  const newTypes = isSelected
-                                    ? currentTypes.filter((t) => t !== type.value)
-                                    : [...currentTypes, type.value];
+                                  let newTypes: string[];
+                                  if (isSelected) {
+                                    // Don't allow deselecting if it's the only one selected
+                                    if (currentTypes.length <= 1) {
+                                      toast({ title: "At least one display type is required", variant: "destructive" });
+                                      return;
+                                    }
+                                    newTypes = currentTypes.filter((t) => t !== type.value);
+                                  } else {
+                                    newTypes = [...currentTypes, type.value];
+                                  }
                                   setEditingForm({ ...editingForm, display_types: newTypes });
                                 }}
                                 className={`p-4 rounded-xl border-2 text-left transition-all ${
