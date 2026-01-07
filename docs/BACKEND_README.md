@@ -16,6 +16,64 @@ The backend is powered by **Lovable Cloud** which provides:
 
 ## Edge Functions
 
+### `check-admin`
+
+**Location:** `supabase/functions/check-admin/index.ts`
+
+**Purpose:** Secure server-side admin role verification. This prevents client-side manipulation of admin status.
+
+**Endpoint:** `POST /functions/v1/check-admin`
+
+**Authentication:** Requires valid JWT token in Authorization header.
+
+**Request Headers:**
+```
+Authorization: Bearer <user_access_token>
+```
+
+**Response:**
+```json
+// Success - User is admin
+{
+  "isAdmin": true
+}
+
+// Success - User is not admin
+{
+  "isAdmin": false
+}
+
+// Error - No authorization
+{
+  "isAdmin": false,
+  "error": "No authorization header"
+}
+
+// Error - Invalid token
+{
+  "isAdmin": false,
+  "error": "Invalid or expired token"
+}
+```
+
+**How it works:**
+1. Receives the user's JWT token from Authorization header
+2. Creates a Supabase client with the user's token to get their user ID
+3. Uses the service role key to query `user_roles` table (bypasses RLS)
+4. Returns boolean `isAdmin` status
+
+**Frontend Usage:**
+```typescript
+const { data, error } = await supabase.functions.invoke("check-admin", {
+  headers: {
+    Authorization: `Bearer ${session.access_token}`,
+  },
+});
+const isAdmin = data?.isAdmin === true;
+```
+
+---
+
 ### `submit-form`
 
 **Location:** `supabase/functions/submit-form/index.ts`
@@ -151,14 +209,28 @@ Roles are stored in the `user_roles` table, separate from user profiles for secu
 
 ### Checking Roles
 
-**In Frontend:**
+**In Frontend (Recommended - Server-side check):**
 ```typescript
-// Using the has_role database function via RLS policies
-// Or fetch directly:
-const { data: roles } = await supabase
-  .from('user_roles')
-  .select('role')
-  .eq('user_id', user.id);
+// Use the check-admin edge function for secure server-side verification
+const checkAdminRole = async (accessToken: string) => {
+  const { data, error } = await supabase.functions.invoke("check-admin", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return data?.isAdmin === true;
+};
+
+// With session caching to reduce backend calls
+const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+const cached = sessionStorage.getItem('admin_status_cache');
+if (cached) {
+  const { userId, isAdmin, timestamp } = JSON.parse(cached);
+  if (userId === currentUserId && Date.now() - timestamp < CACHE_DURATION_MS) {
+    return isAdmin; // Use cached value
+  }
+}
+// Otherwise call the edge function and cache the result
 ```
 
 **In RLS Policies:**
@@ -303,7 +375,12 @@ FOR INSERT WITH CHECK (bucket_id = 'bucket-name' AND auth.uid()::text = (storage
 3. **"Invalid form type"**
    - Ensure formType matches one of: `contact_requests`, `career_applications`, `nowrise_applications`
 
-4. **Google OAuth not working**
+4. **"Admin check returning false incorrectly"**
+   - Verify user has entry in `user_roles` table with `role = 'admin'`
+   - Clear browser sessionStorage to reset cached admin status
+   - Check edge function logs for errors
+
+5. **Google OAuth not working**
    - Verify redirect URLs are configured
    - Check Google Cloud Console credentials
    - Ensure Site URL is set correctly

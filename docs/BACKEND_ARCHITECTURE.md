@@ -270,21 +270,42 @@ AS $$
 $$;
 ```
 
-### Frontend Role Checking
+### Frontend Role Checking (Server-Side)
+
+**IMPORTANT:** Admin checks should happen on the server, not client-side.
 
 ```typescript
-// In AuthContext
-const checkAdminRole = async (userId: string) => {
-  const { data } = await supabase
-    .from('user_roles')
-    .select('role')
-    .eq('user_id', userId)
-    .eq('role', 'admin')
-    .single();
+// In AuthContext - Use edge function for secure server-side check
+const checkAdminRole = async (accessToken: string, userId: string) => {
+  // Check cache first to reduce backend calls
+  const cached = getCachedAdminStatus(userId);
+  if (cached !== null) {
+    return cached;
+  }
+
+  // Call backend edge function for secure server-side check
+  const { data, error } = await supabase.functions.invoke("check-admin", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (error) {
+    console.error("Error checking admin role:", error);
+    return false;
+  }
   
-  setIsAdmin(!!data);
+  const isAdmin = data?.isAdmin === true;
+  setCachedAdminStatus(userId, isAdmin); // Cache for 5 minutes
+  return isAdmin;
 };
 ```
+
+**Why Server-Side?**
+- Client-side role checks can be bypassed by manipulating JavaScript
+- Edge function uses service role key to query user_roles table
+- Result is a simple boolean, no role data exposed to client
+- Session caching reduces backend calls (5 minute TTL)
 
 ---
 
