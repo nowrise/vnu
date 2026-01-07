@@ -134,8 +134,8 @@ const FormManagement = () => {
       return (data || []).map((form) => ({
         ...form,
         fields: (form.fields as unknown as FormField[]) || [],
-        target_pages: form.target_page ? form.target_page.split(",") : [],
-        display_types: form.display_type ? form.display_type.split(",") : [],
+        target_pages: form.target_page ? form.target_page.split(",").filter(Boolean) : [],
+        display_types: form.display_type ? form.display_type.split(",").filter(Boolean) : ["popup"],
       })) as CustomForm[];
     },
   });
@@ -157,8 +157,8 @@ const FormManagement = () => {
       return {
         ...data,
         fields: (data.fields as unknown as FormField[]) || [],
-        target_pages: data.target_page ? data.target_page.split(",") : [],
-        display_types: data.display_type ? data.display_type.split(",") : [],
+        target_pages: data.target_page ? data.target_page.split(",").filter(Boolean) : [],
+        display_types: data.display_type ? data.display_type.split(",").filter(Boolean) : ["popup"],
       } as CustomForm;
     },
     onSuccess: (data) => {
@@ -182,8 +182,8 @@ const FormManagement = () => {
           form_name: form.form_name,
           description: form.description,
           fields: form.fields as unknown as never,
-          target_page: form.target_pages?.join(",") || "",
-          display_type: form.display_types?.join(",") || "popup",
+          target_page: form.target_pages?.filter(Boolean).join(",") || "",
+          display_type: form.display_types?.filter(Boolean).join(",") || "popup",
           is_published: form.is_published,
           popup_trigger_text: form.popup_trigger_text,
           section_title: form.section_title,
