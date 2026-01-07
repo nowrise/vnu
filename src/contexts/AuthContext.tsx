@@ -22,20 +22,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const checkAdminRole = async (userId: string) => {
+  const checkAdminRole = async (accessToken: string) => {
     try {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .eq("role", "admin")
-        .maybeSingle();
+      // Call backend edge function for secure server-side admin check
+      const { data, error } = await supabase.functions.invoke("check-admin", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
       if (error) {
         console.error("Error checking admin role:", error);
         return false;
       }
-      return !!data;
+      return data?.isAdmin === true;
     } catch (error) {
       console.error("Error checking admin role:", error);
       return false;
@@ -50,10 +50,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(session?.user ?? null);
         setIsLoading(false);
 
-        // Check admin role with setTimeout to avoid deadlock
-        if (session?.user) {
+        if (session?.user && session.access_token) {
           setTimeout(() => {
-            checkAdminRole(session.user.id).then(setIsAdmin);
+            checkAdminRole(session.access_token).then(setIsAdmin);
           }, 0);
         } else {
           setIsAdmin(false);
@@ -67,8 +66,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(session?.user ?? null);
       setIsLoading(false);
 
-      if (session?.user) {
-        checkAdminRole(session.user.id).then(setIsAdmin);
+      if (session?.user && session.access_token) {
+        checkAdminRole(session.access_token).then(setIsAdmin);
       }
     });
 
