@@ -297,7 +297,28 @@ INSERT INTO public.form_submissions (form_id, status, submission_data) VALUES
   ('d23132cb-f979-49e7-83c2-46fb650f6ece', 'pending', '{"Email Address":"varunreddy3173@gmail.com","name":"Hwh"}'::jsonb);
 
 -- ============================================================
--- PART 8: NOTES FOR NEW SUPABASE PROJECT
+-- PART 8: EDGE FUNCTIONS
+-- ============================================================
+
+/*
+The following Edge Functions are deployed with this project:
+
+1. check-admin (supabase/functions/check-admin/index.ts)
+   - Purpose: Secure server-side admin role verification
+   - Endpoint: POST /functions/v1/check-admin
+   - Auth: Requires JWT token in Authorization header
+   - Returns: { isAdmin: boolean }
+   - Uses service role key to query user_roles table securely
+
+2. submit-form (supabase/functions/submit-form/index.ts)
+   - Purpose: Handle public form submissions with security features
+   - Endpoint: POST /functions/v1/submit-form
+   - Features: Rate limiting (5/min), honeypot protection, input validation
+   - Supported forms: contact_requests, career_applications, nowrise_applications
+*/
+
+-- ============================================================
+-- PART 9: NOTES FOR NEW SUPABASE PROJECT
 -- ============================================================
 
 /*
@@ -318,5 +339,12 @@ To recreate this database in a new Supabase project:
 6. Update your frontend .env:
    - VITE_SUPABASE_URL=your-project-url
    - VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
-7. Deploy edge functions (copy from supabase/functions folder)
+7. Deploy edge functions:
+   - Copy supabase/functions/check-admin folder
+   - Copy supabase/functions/submit-form folder
+   - Deploy using Supabase CLI: supabase functions deploy
+8. Set required secrets for edge functions:
+   - SUPABASE_URL (auto-configured)
+   - SUPABASE_ANON_KEY (auto-configured)
+   - SUPABASE_SERVICE_ROLE_KEY (auto-configured)
 */
