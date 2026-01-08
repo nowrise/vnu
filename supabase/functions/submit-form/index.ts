@@ -1,10 +1,45 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// Allowed origins for CORS - restrict to specific domains
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://lovable.dev',
+];
+
+// Pattern-based allowed origins (subdomains)
+const allowedPatterns = [
+  /^https:\/\/[a-z0-9-]+\.lovable\.app$/,
+  /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/,
+];
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get('origin') || '';
+  
+  // Check exact match
+  if (allowedOrigins.includes(origin)) {
+    return {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    };
+  }
+  
+  // Check pattern match
+  for (const pattern of allowedPatterns) {
+    if (pattern.test(origin)) {
+      return {
+        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+      };
+    }
+  }
+  
+  // Default: no CORS header (blocks the request)
+  return {
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 // In-memory rate limiting store (resets on function cold start)
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
@@ -91,6 +126,8 @@ function validateNowriseApplication(data: Record<string, unknown>): { valid: boo
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
