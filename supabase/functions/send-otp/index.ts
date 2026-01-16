@@ -1,10 +1,41 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// Allowed origins for CORS
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://lovable.dev',
+  'https://vnuitsolutions.com',
+  'https://www.vnuitsolutions.com',
+  'https://vnu.lovable.app',
+];
+
+// Patterns for dynamic subdomains
+const allowedPatterns = [
+  /^https:\/\/[a-z0-9-]+\.lovable\.app$/,
+  /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/,
+  /^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/,
+];
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get('origin') || '';
+  
+  const isAllowed = allowedOrigins.includes(origin) || 
+                    allowedPatterns.some(pattern => pattern.test(origin));
+  
+  if (isAllowed) {
+    return {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    };
+  }
+  
+  // Return headers without origin for disallowed origins
+  return {
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 // In-memory OTP store (in production, use database)
 const otpStore = new Map<string, { otp: string; expiresAt: number; attempts: number }>();
@@ -77,6 +108,8 @@ async function sendEmailWithResend(email: string, otp: string, resendApiKey: str
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
