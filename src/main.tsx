@@ -1,9 +1,9 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import { initSentry } from "./lib/sentry";
+import { initErrorMonitoring } from "./lib/error-monitoring";
 
-// Initialize Sentry before rendering
-initSentry();
+// Initialize error monitoring before rendering
+initErrorMonitoring();
 
 createRoot(document.getElementById("root")!).render(<App />);
