@@ -2,7 +2,7 @@ import { useContext, useEffect, useState, type ReactNode } from "react";
 import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContext } from "./auth-context";
-import { setUserContext, clearUserContext, addBreadcrumb } from "@/lib/sentry";
+import { setUserContext, clearUserContext, addBreadcrumb } from "@/lib/error-monitoring";
 
 export interface AuthContextType {
   user: User | null;
