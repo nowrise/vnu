@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ErrorBoundary } from "@/lib/error-monitoring";
 import { ErrorFallback } from "@/components/ErrorFallback";
+import { StructuredData } from "@/components/StructuredData";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import AIConsulting from "./pages/AIConsulting";
@@ -48,6 +49,7 @@ const App = () => (
           <CookieConsent />
           <BrowserRouter>
             <ScrollToTop />
+            <StructuredData />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
