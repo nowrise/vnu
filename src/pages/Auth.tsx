@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, ArrowRight, Mail, Loader2, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, Mail, Loader2, ShieldCheck, Clock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,10 +61,51 @@ const Auth = () => {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [otpResendTimer, setOtpResendTimer] = useState(0);
   const [awaitingOtpVerification, setAwaitingOtpVerification] = useState(false);
+  const [resetLinkExpired, setResetLinkExpired] = useState(false);
   const navigate = useNavigate();
-  const { signIn, signUp, signInWithGoogle, resetPassword, user } = useAuth();
+  const { signIn, signUp, signInWithGoogle, resetPassword, user, session } = useAuth();
 
-  // Redirect if already logged in (but not if awaiting OTP verification)
+  // Check if reset link has expired (session should be recovery type within 1 hour)
+  useEffect(() => {
+    const checkResetTokenValidity = async () => {
+      if (isResetMode) {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        
+        if (!currentSession) {
+          // No session means the reset link is invalid or expired
+          setResetLinkExpired(true);
+          toast({
+            title: "Reset link expired",
+            description: "This password reset link has expired. Please request a new one.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // Check if the session was created recently (within 1 hour for reset links)
+        const sessionCreatedAt = new Date(currentSession.user?.created_at || 0).getTime();
+        const lastSignIn = currentSession.user?.last_sign_in_at 
+          ? new Date(currentSession.user.last_sign_in_at).getTime() 
+          : sessionCreatedAt;
+        const now = Date.now();
+        const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+        
+        if (now - lastSignIn > oneHour) {
+          setResetLinkExpired(true);
+          await supabase.auth.signOut();
+          toast({
+            title: "Reset link expired",
+            description: "This password reset link has expired. Please request a new one.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+    
+    checkResetTokenValidity();
+  }, [isResetMode]);
+
+  // Redirect if already logged in (but not if awaiting OTP verification or in reset mode)
   useEffect(() => {
     if (user && !isResetMode && !awaitingOtpVerification && authMode !== "otp") {
       navigate("/");
@@ -637,55 +678,89 @@ const Auth = () => {
 
           {/* Reset Password Form */}
           {authMode === "reset" && (
-            <form onSubmit={resetPasswordForm.handleSubmit(handleResetPassword)} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">New Password</label>
-                <div className="relative">
+            resetLinkExpired ? (
+              <div className="text-center space-y-4">
+                <div className="flex justify-center mb-4">
+                  <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
+                    <Clock className="w-8 h-8 text-destructive" />
+                  </div>
+                </div>
+                <h2 className="text-xl font-semibold text-foreground">Link Expired</h2>
+                <p className="text-muted-foreground">
+                  This password reset link has expired for security reasons. Reset links are valid for 1 hour.
+                </p>
+                <button
+                  onClick={() => {
+                    setAuthMode("forgot");
+                    setResetLinkExpired(false);
+                    navigate("/auth");
+                  }}
+                  className="btn-gold w-full flex items-center justify-center gap-2"
+                >
+                  Request New Reset Link
+                </button>
+                <button
+                  onClick={() => {
+                    setAuthMode("login");
+                    setResetLinkExpired(false);
+                    navigate("/auth");
+                  }}
+                  className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  ← Back to login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={resetPasswordForm.handleSubmit(handleResetPassword)} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">New Password</label>
+                  <div className="relative">
+                    <input
+                      {...resetPasswordForm.register("password")}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {resetPasswordForm.formState.errors.password && (
+                    <p className="text-destructive text-sm mt-1">
+                      {resetPasswordForm.formState.errors.password.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Confirm Password</label>
                   <input
-                    {...resetPasswordForm.register("password")}
+                    {...resetPasswordForm.register("confirmPassword")}
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all pr-12"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                  {resetPasswordForm.formState.errors.confirmPassword && (
+                    <p className="text-destructive text-sm mt-1">
+                      {resetPasswordForm.formState.errors.confirmPassword.message}
+                    </p>
+                  )}
                 </div>
-                {resetPasswordForm.formState.errors.password && (
-                  <p className="text-destructive text-sm mt-1">
-                    {resetPasswordForm.formState.errors.password.message}
-                  </p>
-                )}
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Confirm Password</label>
-                <input
-                  {...resetPasswordForm.register("confirmPassword")}
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                />
-                {resetPasswordForm.formState.errors.confirmPassword && (
-                  <p className="text-destructive text-sm mt-1">
-                    {resetPasswordForm.formState.errors.confirmPassword.message}
-                  </p>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="btn-gold w-full flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {isSubmitting ? <LoadingSpinner /> : null}
-                {isSubmitting ? "Updating..." : "Update Password"}
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn-gold w-full flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isSubmitting ? <LoadingSpinner /> : null}
+                  {isSubmitting ? "Updating..." : "Update Password"}
+                </button>
+              </form>
+            )
           )}
 
           {/* Forgot Password Form */}
