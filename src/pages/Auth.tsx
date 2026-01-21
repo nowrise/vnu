@@ -62,6 +62,7 @@ const Auth = () => {
   const [otpResendTimer, setOtpResendTimer] = useState(0);
   const [awaitingOtpVerification, setAwaitingOtpVerification] = useState(false);
   const [resetLinkExpired, setResetLinkExpired] = useState(false);
+  const [resetCooldownTimer, setResetCooldownTimer] = useState(0);
   const navigate = useNavigate();
   const { signIn, signUp, signInWithGoogle, resetPassword, user, session } = useAuth();
 
@@ -119,6 +120,14 @@ const Auth = () => {
       return () => clearTimeout(timer);
     }
   }, [otpResendTimer]);
+
+  // Reset password cooldown timer
+  useEffect(() => {
+    if (resetCooldownTimer > 0) {
+      const timer = setTimeout(() => setResetCooldownTimer(resetCooldownTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resetCooldownTimer]);
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -393,12 +402,25 @@ const Auth = () => {
   };
 
   const handleForgotPassword = async (data: ForgotPasswordFormData) => {
+    // Check rate limit
+    if (resetCooldownTimer > 0) {
+      toast({
+        title: "Please wait",
+        description: `You can request another reset link in ${resetCooldownTimer} seconds.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // Send password reset email immediately without checking user existence
       // Supabase handles non-existent emails gracefully and we don't want to leak user info
       // Show success immediately for better UX and security (don't reveal if email exists)
       const resetPromise = resetPassword(data.email);
+      
+      // Start cooldown timer (60 seconds)
+      setResetCooldownTimer(60);
       
       // Show success toast immediately for faster perceived response
       toast({
@@ -781,11 +803,15 @@ const Auth = () => {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || resetCooldownTimer > 0}
                 className="btn-gold w-full flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isSubmitting ? <LoadingSpinner /> : null}
-                {isSubmitting ? "Sending..." : "Send Reset Link"}
+                {isSubmitting 
+                  ? "Sending..." 
+                  : resetCooldownTimer > 0 
+                    ? `Wait ${resetCooldownTimer}s` 
+                    : "Send Reset Link"}
               </button>
 
               <button
