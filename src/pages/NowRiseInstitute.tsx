@@ -151,18 +151,75 @@ const NowRiseInstitute = () => {
         </div>
       </section>
 
-      {/* Dynamic Programs Section */}
+      {/* What We Offer Section - Static */}
       <section className="section-padding">
         <div className="container-custom">
           <SectionHeader
-            title="Our Programs"
+            title="What We Offer"
             description="Comprehensive education pathways built for the modern digital economy."
             centered={false}
           />
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-            {hasPrograms ? (
-              programs.map((program, index) => {
+            {fallbackPrograms.map((program, index) => (
+              <motion.div
+                key={program.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: index * 0.15 }}
+                whileHover={{ y: -8 }}
+                className="service-card card-hover group"
+              >
+                <motion.div
+                  className="w-12 h-12 rounded-lg bg-background flex items-center justify-center mb-6"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <program.icon size={24} className="text-foreground group-hover:text-primary transition-colors" />
+                </motion.div>
+                <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors">
+                  {program.title}
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  {program.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* View Programs CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="text-center mt-12"
+          >
+            <Link to="#programs" onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('programs-section')?.scrollIntoView({ behavior: 'smooth' });
+            }} className="btn-gold inline-flex items-center gap-2">
+              View All Programs <ArrowRight className="h-4 w-4" />
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Dynamic Programs Section */}
+      <section id="programs-section" className="section-padding section-taupe">
+        <div className="container-custom">
+          <div className="flex items-center justify-between mb-12">
+            <SectionHeader
+              title="Our Courses & Programs"
+              description="Explore our industry-aligned training courses and start your journey today."
+              centered={false}
+            />
+          </div>
+
+          {hasPrograms ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {programs.map((program, index) => {
                 const IconComponent = iconMap[program.icon || "BookOpen"] || BookOpen;
                 return (
                   <motion.div
@@ -175,10 +232,10 @@ const NowRiseInstitute = () => {
                   >
                     <Link
                       to={`/program/${program.slug}`}
-                      className="service-card card-hover group cursor-pointer block h-full"
+                      className="service-card card-hover group cursor-pointer block h-full bg-background"
                     >
                       <motion.div
-                        className="w-12 h-12 rounded-lg bg-background flex items-center justify-center mb-6"
+                        className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mb-6"
                         whileHover={{ scale: 1.1, rotate: 5 }}
                         transition={{ type: "spring", stiffness: 300 }}
                       >
@@ -190,46 +247,26 @@ const NowRiseInstitute = () => {
                       <p className="text-muted-foreground text-sm mb-4">
                         {program.description}
                       </p>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        {program.duration && <span>{program.duration}</span>}
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                        {program.duration && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{program.duration}</span>}
                         {program.level && <span className="text-primary">{program.level}</span>}
                       </div>
-                      <div className="flex items-center gap-2 mt-4 text-primary text-sm font-medium">
-                        Learn More <ArrowRight className="h-4 w-4" />
+                      <div className="flex items-center gap-2 text-primary text-sm font-medium">
+                        Enroll Now <ArrowRight className="h-4 w-4" />
                       </div>
                     </Link>
                   </motion.div>
                 );
-              })
-            ) : (
-              // Fallback static programs
-              fallbackPrograms.map((program, index) => (
-                <motion.div
-                  key={program.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.5, delay: index * 0.15 }}
-                  whileHover={{ y: -8 }}
-                  className="service-card card-hover group cursor-pointer"
-                >
-                  <motion.div
-                    className="w-12 h-12 rounded-lg bg-background flex items-center justify-center mb-6"
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <program.icon size={24} className="text-foreground group-hover:text-primary transition-colors" />
-                  </motion.div>
-                  <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors">
-                    {program.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    {program.description}
-                  </p>
-                </motion.div>
-              ))
-            )}
-          </div>
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground mb-4">Programs coming soon. Stay tuned!</p>
+              <Link to="/contact" className="btn-outline inline-flex items-center gap-2">
+                Get Notified <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
