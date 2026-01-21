@@ -395,34 +395,29 @@ const Auth = () => {
   const handleForgotPassword = async (data: ForgotPasswordFormData) => {
     setIsSubmitting(true);
     try {
-      // Check if user exists
-      const userExists = await checkUserExists(data.email);
+      // Send password reset email immediately without checking user existence
+      // Supabase handles non-existent emails gracefully and we don't want to leak user info
+      // Show success immediately for better UX and security (don't reveal if email exists)
+      const resetPromise = resetPassword(data.email);
       
-      if (!userExists) {
-        toast({
-          title: "Account not found",
-          description: "No account exists with this email address.",
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      // User exists, send password reset email
-      await resetPassword(data.email);
-      
+      // Show success toast immediately for faster perceived response
       toast({
         title: "Reset link sent!",
-        description: "Check your email for the password reset link.",
+        description: "If an account exists with this email, you'll receive a reset link shortly.",
       });
       setAuthMode("login");
+      setIsSubmitting(false);
+      
+      // Let the email send in the background
+      resetPromise.catch((error) => {
+        console.error("Reset password error:", error);
+      });
     } catch (error) {
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsSubmitting(false);
     }
   };
