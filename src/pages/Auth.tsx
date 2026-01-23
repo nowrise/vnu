@@ -108,7 +108,12 @@ const Auth = () => {
 
   // Redirect if already logged in (but not if awaiting OTP verification or in reset mode)
   useEffect(() => {
-    if (user && !isResetMode && !awaitingOtpVerification && authMode !== "otp") {
+    // Never redirect when in reset mode - user needs to update password
+    if (isResetMode || authMode === "reset") {
+      return;
+    }
+    
+    if (user && !awaitingOtpVerification && authMode !== "otp") {
       navigate("/");
     }
   }, [user, navigate, isResetMode, awaitingOtpVerification, authMode]);
@@ -457,11 +462,18 @@ const Auth = () => {
           variant: "destructive",
         });
       } else {
+        // Sign out the recovery session for security
+        await supabase.auth.signOut();
+        
         toast({
           title: "Password updated!",
-          description: "Your password has been successfully changed.",
+          description: "Your password has been successfully changed. Please log in with your new password.",
         });
-        navigate("/");
+        
+        // Redirect to login page (not home, since we signed out)
+        setAuthMode("login");
+        // Clear the reset query param
+        navigate("/auth", { replace: true });
       }
     } catch (error) {
       toast({
