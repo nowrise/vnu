@@ -53,11 +53,12 @@ Deno.serve(async (req) => {
   try {
     // Get the authorization header
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader) {
       console.log("No authorization header provided");
       return new Response(
-        JSON.stringify({ isAdmin: false, error: "unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ isAdmin: false, error: "No authorization header" }),
+        // Return 200 to avoid noisy 401s on public pages; admin will simply be false.
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -94,8 +95,9 @@ Deno.serve(async (req) => {
     if (userError || !user) {
       console.log("Failed to get user from token:", userError?.message);
       return new Response(
-        JSON.stringify({ isAdmin: false, error: "unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ isAdmin: false, error: "Invalid or expired token" }),
+        // Return 200 to avoid noisy 401s; invalid tokens simply yield isAdmin:false.
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
