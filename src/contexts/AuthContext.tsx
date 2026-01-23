@@ -111,6 +111,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (import.meta.env.DEV) console.log("Auth state changed:", event);
+        
+        // Handle PASSWORD_RECOVERY event - redirect to reset page without auto-login behavior
+        if (event === 'PASSWORD_RECOVERY') {
+          if (import.meta.env.DEV) console.log("Password recovery event detected, redirecting to reset page");
+          // Set session but flag that we're in recovery mode
+          setSession(session);
+          setUser(session?.user ?? null);
+          setIsLoading(false);
+          // Redirect to reset password page
+          window.location.href = `${window.location.origin}/auth?reset=true`;
+          return;
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
         setIsLoading(false);
