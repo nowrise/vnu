@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const checkAdminRole = async (accessToken: string, userId: string, forceRefresh = false) => {
+  const checkAdminRole = async (userId: string, forceRefresh = false) => {
     // Check cache first (unless forcing refresh)
     if (!forceRefresh) {
       const cached = getCachedAdminStatus(userId);
@@ -83,12 +83,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       if (import.meta.env.DEV) console.log("Checking admin role via edge function...");
-      // Call backend edge function for secure server-side admin check
-      const { data, error } = await supabase.functions.invoke("check-admin", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      // Call backend function. The client will attach the user session automatically when available.
+      const { data, error } = await supabase.functions.invoke("check-admin");
 
       if (import.meta.env.DEV) console.log("Admin check response:", { data, error });
 
@@ -129,7 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // Force refresh on sign in events to ensure fresh admin check
           const forceRefresh = event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED';
           setTimeout(() => {
-            checkAdminRole(session.access_token, session.user.id, forceRefresh).then(setIsAdmin);
+            checkAdminRole(session.user.id, forceRefresh).then(setIsAdmin);
           }, 0);
         } else {
           // Clear Sentry user context on logout
@@ -149,7 +145,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (session?.user && session.access_token) {
         // Set user context for Sentry error tracking
         setUserContext({ id: session.user.id, email: session.user.email });
-        checkAdminRole(session.access_token, session.user.id).then(setIsAdmin);
+        checkAdminRole(session.user.id).then(setIsAdmin);
       }
     });
 
