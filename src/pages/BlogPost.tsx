@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Calendar, Clock, User, ArrowLeft, Tag } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
+import DOMPurify from "dompurify";
 
 interface Blog {
   id: string;
@@ -69,22 +70,24 @@ export default function BlogPost() {
   // Simple markdown-like rendering (headings, bold, links, code blocks)
   const renderContent = (content: string) => {
     return content.split("\n\n").map((paragraph, i) => {
+      const sanitize = (text: string) => DOMPurify.sanitize(text, { ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'code', 'br'], ALLOWED_ATTR: ['href', 'target', 'rel'] });
+
       // Headings
       if (paragraph.startsWith("### ")) {
-        return <h3 key={i} className="text-xl font-semibold mt-8 mb-4">{paragraph.slice(4)}</h3>;
+        return <h3 key={i} className="text-xl font-semibold mt-8 mb-4" dangerouslySetInnerHTML={{ __html: sanitize(paragraph.slice(4)) }} />;
       }
       if (paragraph.startsWith("## ")) {
-        return <h2 key={i} className="text-2xl font-bold mt-10 mb-4">{paragraph.slice(3)}</h2>;
+        return <h2 key={i} className="text-2xl font-bold mt-10 mb-4" dangerouslySetInnerHTML={{ __html: sanitize(paragraph.slice(3)) }} />;
       }
       if (paragraph.startsWith("# ")) {
-        return <h1 key={i} className="text-3xl font-bold mt-12 mb-6">{paragraph.slice(2)}</h1>;
+        return <h1 key={i} className="text-3xl font-bold mt-12 mb-6" dangerouslySetInnerHTML={{ __html: sanitize(paragraph.slice(2)) }} />;
       }
       // Code blocks
       if (paragraph.startsWith("```")) {
         const code = paragraph.replace(/```\w*\n?/g, "").trim();
         return (
           <pre key={i} className="bg-muted p-4 rounded-lg overflow-x-auto my-4 text-sm">
-            <code>{code}</code>
+            <code>{DOMPurify.sanitize(code, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })}</code>
           </pre>
         );
       }
@@ -94,13 +97,13 @@ export default function BlogPost() {
         return (
           <ul key={i} className="list-disc list-inside space-y-2 my-4">
             {items.map((item, j) => (
-              <li key={j}>{item.slice(2)}</li>
+              <li key={j} dangerouslySetInnerHTML={{ __html: sanitize(item.slice(2)) }} />
             ))}
           </ul>
         );
       }
       // Regular paragraph
-      return <p key={i} className="text-muted-foreground leading-relaxed my-4">{paragraph}</p>;
+      return <p key={i} className="text-muted-foreground leading-relaxed my-4" dangerouslySetInnerHTML={{ __html: sanitize(paragraph) }} />;
     });
   };
 
